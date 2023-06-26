@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "403285581942",
+    "project_id": "androidproyecto-fcascan",
+    "storage_bucket": "androidproyecto-fcascan.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:403285581942:android:47537235dbe0361ef43f57",
+        "android_client_info": {
+          "package_name": "com.fcascan.proyectofinal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "403285581942-ntskl93qgoev7tm24b4k1m1k492310c6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwfhDdyUbp7uhmf37ew3jkXzaLP6wXPas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "403285581942-2opessm214l5p1nednsl3ehmi73bodvq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

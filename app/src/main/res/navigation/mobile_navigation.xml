@@ -15,11 +15,27 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.fcascan.proyectofinal.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard" >
+        <action
+            android:id="@+id/action_navigation_dashboard_to_itemDetailFragment"
+            app:destination="@id/itemDetailFragment" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.fcascan.proyectofinal.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_account"
+        android:name="com.fcascan.proyectofinal.ui.account.AccountFragment"
+        android:label="@string/title_account"
+        tools:layout="@layout/fragment_account" />
+    <fragment
+        android:id="@+id/itemDetailFragment"
+        android:name="com.fcascan.proyectofinal.ui.item_details.ItemDetailFragment"
+        android:label="ItemDetailFragment" >
+        <argument
+            android:name="editPermissions"
+            app:argType="boolean" />
+        <argument
+            android:name="itemId"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>
