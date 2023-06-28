@@ -1,7 +1,10 @@
 package com.fcascan.proyectofinal.entities
 
+import com.google.firebase.firestore.DocumentId
+
 data class Item(
-    var ID: String? = null,
+    @DocumentId
+    val documentId: String? = null,
     var userID: String? = null,
     var title: String? = null,
     var description: String? = null,
@@ -9,6 +12,6 @@ data class Item(
     var groupID: String? = null
 ) {
     override fun toString(): String {
-        return """Item: $ID - $title"""
+        return """$documentId - $title"""
     }
 }

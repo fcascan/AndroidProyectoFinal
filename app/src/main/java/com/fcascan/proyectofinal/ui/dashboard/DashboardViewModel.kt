@@ -1,5 +1,6 @@
 package com.fcascan.proyectofinal.ui.dashboard
 
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +12,7 @@ import com.fcascan.proyectofinal.entities.Category
 import com.fcascan.proyectofinal.entities.Group
 import com.fcascan.proyectofinal.entities.Item
 
-class DashboardViewModel(private val mainActivityViewModel: MainActivityViewModel) : ViewModel() {
+class DashboardViewModel : ViewModel() {
     private val _className = "FCC#DashboardViewModel"
 
     //LiveData for the View:
@@ -19,34 +20,14 @@ class DashboardViewModel(private val mainActivityViewModel: MainActivityViewMode
     var spinnerCategoriesContent: MutableLiveData<MutableList<String>?> = MutableLiveData()
     var spinnerGroupsContent: MutableLiveData<MutableList<String>?> = MutableLiveData()
 
-    //Private Copies of the LiveData from the MainActivityViewModel:
-    private var itemsList: MutableList<Item> = mutableListOf()
-    private var categoriesList: MutableList<Category> = mutableListOf()
-    private var groupsList: MutableList<Group> = mutableListOf()
-
     //Filtering variables:
     private var seachQuery: String = ""
     private var selectedCategoryName: String = ""
     private var selectedGroupName: String = ""
-    private lateinit var filteredItemsList: MutableList<Item>
+    lateinit var filteredItemsList: MutableList<Item>
+
 
     //Public functions for the FragmentView:
-    fun populateDashboard(lifecycleOwner: LifecycleOwner) {
-        mainActivityViewModel.itemsList.observe(lifecycleOwner) {
-            itemsList = it
-            updateAdapterList(itemsList)
-        }
-        mainActivityViewModel.categoriesList.observe(lifecycleOwner) {
-            categoriesList = it
-            updateSpinnerCategories(it)
-        }
-        mainActivityViewModel.groupsList.observe(lifecycleOwner) {
-            groupsList = it
-            updateSpinnerGroups(it)
-        }
-    }
-
-
     fun onPlayClicked(index: Int) {
         Log.d("$_className - onPlayClicked", "Playing item ${filteredItemsList[index].title}")
 //        TODO()
@@ -62,28 +43,24 @@ class DashboardViewModel(private val mainActivityViewModel: MainActivityViewMode
 //        TODO()
     }
 
-    fun filterItemsByName(name: String?) {
-        Log.d("$_className - filterItemsByName", "Name: $name")
-        seachQuery = name ?: ""
-        filterRecViewContent()
+    fun setSearchQuery(query: String?) {
+        Log.d("$_className - setSearchQuery", "Query: $query")
+        seachQuery = query ?: ""
     }
 
-    fun filterItemsByCategory(name: String?) {
-        Log.d("$_className - filterItemsByCategory", "Name: $name")
+    fun setSelectedCategory(name: String?) {
+        Log.d("$_className - setSelectedCategory", "Name: $name")
         selectedCategoryName = if (name.isNullOrEmpty() || name == "all") "" else name
-        filterRecViewContent()
     }
 
-    fun filterItemsByGroup(name: String?) {
-        Log.d("$_className - filterItemsByGroup", "Name: $name")
+    fun setSelectedGroup(name: String?) {
+        Log.d("$_className - setSelectedGroup", "Name: $name")
         selectedGroupName = if (name.isNullOrEmpty() || name == "all") "" else name
-        filterRecViewContent()
     }
 
     //Private functions:
-    private fun filterRecViewContent() {
+    fun filterRecViewContent(itemsList: MutableList<Item>) {
         Log.d("$_className - filterRecViewContent", "Query: $seachQuery - Category: $selectedCategoryName - Group: $selectedGroupName")
-        mainActivityViewModel.updateProgressBar(LoadingState.LOADING)
         val filteredList1: MutableList<Item> =
             if (seachQuery.isNotEmpty()) {
                 itemsList.filter { it.title!!.contains(seachQuery, ignoreCase = true) || it.description!!.contains(seachQuery, ignoreCase = true)} as MutableList<Item>
@@ -107,30 +84,26 @@ class DashboardViewModel(private val mainActivityViewModel: MainActivityViewMode
         filteredItemsList = filteredList3
         Log.d("$_className - filterRecViewContent", "filteredItemsList: $filteredItemsList")
         recViewContent.postValue(convertItemsListToAdapterList(filteredItemsList))
-        mainActivityViewModel.updateProgressBar(LoadingState.SUCCESS)
     }
 
-    private fun updateAdapterList(itemsList: MutableList<Item>?) {
+    fun updateAdapterList(itemsList: MutableList<Item>?) {
         Log.d("$_className - updateAdapterList", "itemsList: $itemsList")
-        mainActivityViewModel.updateProgressBar(LoadingState.LOADING)
         if (itemsList.isNullOrEmpty()) {
             Log.d("$_className - updateAdapterList", "itemsList is null or empty")
             recViewContent.postValue(MutableList(0) { ItemsAdapter.ItemObject("", "") })
-            mainActivityViewModel.updateProgressBar(LoadingState.FAILURE)
             return
         }
         val convertedList = convertItemsListToAdapterList(itemsList.toMutableList())
         Log.d("$_className - updateAdapterList", "convertedList: $convertedList")
         recViewContent.postValue(convertedList)
-        mainActivityViewModel.updateProgressBar(LoadingState.SUCCESS)
     }
 
-    private fun updateSpinnerCategories(list: MutableList<Category>?) {
+    fun updateSpinnerCategories(list: MutableList<Category>?) {
         Log.d("$_className - updateSpinnerCategories", "Updating Categories Spinner Content")
         spinnerCategoriesContent.postValue(list?.map { it.name }?.toMutableList())
     }
 
-    private fun updateSpinnerGroups(list: MutableList<Group>?) {
+    fun updateSpinnerGroups(list: MutableList<Group>?) {
         Log.d("$_className - updateSpinnerGroups", "Updating Groups Spinner Content")
         spinnerGroupsContent.postValue(list?.map { it.name }?.toMutableList())
     }

@@ -1,10 +1,14 @@
 package com.fcascan.proyectofinal.entities
 
-class Group {
-    var userID: String = ""
-    var name: String = ""
+import com.google.firebase.firestore.DocumentId
 
+class Group(
+    @DocumentId
+    val documentId: String? = null,
+    var userID: String = "",
+    var name: String = "",
+) {
     override fun toString(): String {
-        return """GroupTitle: $name"""
+        return """$documentId - $name"""
     }
 }

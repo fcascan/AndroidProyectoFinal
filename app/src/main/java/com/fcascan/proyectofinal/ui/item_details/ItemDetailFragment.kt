@@ -10,8 +10,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.fcascan.proyectofinal.R
+import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 
@@ -19,8 +21,8 @@ class ItemDetailFragment : Fragment() {
     private val _className = "FCC#ItemDetailFragment"
 
     //Input Parameters:
-    private var editPermissions: Boolean = false
-    private var itemId : Int? = null
+    private var editPermissions: Boolean? = null
+    private var itemId : String? = null
 
     //View Elements:
     private lateinit var v : View
@@ -37,7 +39,18 @@ class ItemDetailFragment : Fragment() {
     private lateinit var btnDelete: Button
     private lateinit var btnRecord: MaterialButton
 
-    private lateinit var viewModel: ItemDetailViewModel
+    //ViewModels:
+    private lateinit var itemDetailViewModel: ItemDetailViewModel
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        editPermissions = arguments?.getBoolean("paramEditPermissions")
+        itemId = arguments?.getString("paramItemId")
+        Log.d("$_className - onCreate", "Received paramEditPermissions: $editPermissions")
+        Log.d("$_className - onCreate", "Received paramItemId: $itemId")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,16 +75,20 @@ class ItemDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this).get(ItemDetailViewModel::class.java)
+        itemDetailViewModel = ViewModelProvider(this)[ItemDetailViewModel::class.java]
 
         populateFields()
         editPermissionsCheck()
 
-        btnCardPlay.setOnClickListener {
+        btnRecord.setOnClickListener {
+//            onRecordClicked()
             //TODO()
         }
+        btnCardPlay.setOnClickListener {
+            sharedViewModel.playFile(txtFileName.text.toString())
+        }
         btnCardStop.setOnClickListener {
-            //TODO()
+            sharedViewModel.stopPlayback()
         }
         btnSave.setOnClickListener {
             onSavedClicked()
@@ -87,16 +104,26 @@ class ItemDetailFragment : Fragment() {
         }
     }
 
-    fun populateFields() {
+    private fun populateFields() {
         Log.d("$_className - populateFields", "Populate Fields")
         //Primero buscar en la lista el item con el id
-        //Luego llenar los campos con los datos del item
+        val item = itemId?.let { sharedViewModel.getItemById(it) }
+        if (item != null) {
+            txtItemDetailTitle.setText(item.title)
+            txtItemDetailDescription.setText(item.description)
+            spinnerItemDetailCategories.setSelection(sharedViewModel.getCategoryIndexByID(item.categoryID))
+            spinnerItemDetailGroup.setSelection(sharedViewModel.getGroupIndexByID(item.groupID))
+            txtFileName.setText(item.documentId)
+        } else {
+            Log.d("$_className - populateFields", "Item not found")
+            clearFields()
+        }
         //Por ultimo buscar el archivo de audio y mostrar el nombre en el campo de texto
     }
 
-    fun editPermissionsCheck() {
+    private fun editPermissionsCheck() {
         Log.d("$_className - editPermissionsCheck", "Edit Permissions Check: $editPermissions")
-        if(!editPermissions) {
+        if(editPermissions != true) {
             txtItemDetailTitle.focusable = View.NOT_FOCUSABLE
             txtItemDetailDescription.focusable = View.NOT_FOCUSABLE
             spinnerItemDetailCategories.isEnabled = false
@@ -111,38 +138,42 @@ class ItemDetailFragment : Fragment() {
     fun onSelectFileClicked() {
         Log.d("$_className - onSelectFileClicked", "Select File Button Clicked")
         //Ejecutar startFileSelectionActivity de MainActivity
-        TODO()
+//        TODO()
     }
 
-    fun onSavedClicked() {
+    private fun onSavedClicked() {
         Log.d("$_className - onSavedClicked", "Save Button Clicked")
 //        TODO()
-        //1) Guardar los datos en la base de datos
-        //2) Guardar/Pisar el archivo de audio en la carpeta de la app
-        //3) Guardar/Pisar el archivo de audio en la nube
+        //1) Guardar/Pisar como Item en la base de datos y recuperar el ID del documento
+        //2) Guardar/Pisar en Storage con el nombre del ID del documento
+        //3) Guardar/Pisar el archivo de audio en la carpeta de la app
         //4) Volver a la pantalla anterior
 
         findNavController().navigateUp()
     }
 
-    fun onClearClicked() {
+    private fun onClearClicked() {
         Log.d("$_className - onClearClicked", "Clear Button Clicked")
+        clearFields()
+    }
+
+    private fun onBackClicked() {
+        Log.d("$_className - onBackClicked", "Back Button Clicked")
+//        TODO() borrar!
+        findNavController().navigateUp()
+    }
+
+    private fun onDeleteClicked() {
+        Log.d("$_className - onDeleteClicked", "Delete Button Clicked")
+//        TODO()
+    }
+
+    private fun clearFields() {
         txtItemDetailTitle.text.clear()
         txtItemDetailDescription.text.clear()
         spinnerItemDetailCategories.setSelection(0)
         spinnerItemDetailGroup.setSelection(0)
         Snackbar.make(v, "Fields Cleared", Snackbar.LENGTH_SHORT).show()
-    }
-
-    fun onBackClicked() {
-        Log.d("$_className - onBackClicked", "Back Button Clicked")
-//        TODO()
-        findNavController().navigateUp()
-    }
-
-    fun onDeleteClicked() {
-        Log.d("$_className - onDeleteClicked", "Delete Button Clicked")
-        TODO()
     }
 
 }

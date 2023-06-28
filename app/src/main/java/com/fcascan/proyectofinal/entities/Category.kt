@@ -1,10 +1,14 @@
 package com.fcascan.proyectofinal.entities;
 
-class Category {
-    var userID: String = ""
-    var name: String = ""
+import com.google.firebase.firestore.DocumentId
 
+class Category(
+    @DocumentId
+    val documentId: String? = null,
+    var userID: String = "",
+    var name: String = "",
+) {
     override fun toString(): String {
-        return """CategoryName: $name"""
+        return """$documentId - $name"""
     }
 }

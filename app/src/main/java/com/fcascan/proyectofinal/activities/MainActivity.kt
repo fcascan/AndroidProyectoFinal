@@ -15,16 +15,19 @@ import androidx.navigation.ui.setupWithNavController
 import com.fcascan.proyectofinal.enums.LoadingState
 import com.fcascan.proyectofinal.R
 import com.fcascan.proyectofinal.databinding.ActivityMainBinding
+import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
     private val _className = "FCC#MainActivity"
 
-    private lateinit var binding: ActivityMainBinding
-    lateinit var mainActivityViewModel: MainActivityViewModel
-
     //View Elements:
-    lateinit var progressBarMainActivity: ProgressBar
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var progressBarMainActivity: ProgressBar
+
+    //ViewModels:
+    lateinit var mainActivityViewModel: MainActivityViewModel
+    lateinit var sharedViewModel: SharedViewModel
 
     companion object {
         private const val REQUEST_CODE = 1
@@ -37,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mainActivityViewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
+        sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
         supportActionBar?.hide()
 
         //BottomBar:
@@ -54,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
         //ProgressBar:
         progressBarMainActivity = binding.root.findViewById(R.id.progressBarMainActivity)
-        mainActivityViewModel.screenState.observe(this) { state ->
+        sharedViewModel.screenState.observe(this) { state ->
             when (state) {
                 LoadingState.LOADING -> {
                     progressBarMainActivity.visibility = ProgressBar.VISIBLE
@@ -70,22 +74,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         //Retrieve data from Firebase:
-        mainActivityViewModel.updateAllCollectionsLists("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
+        sharedViewModel.setProgressBarState(LoadingState.LOADING)
+        try {
+            sharedViewModel.updateAllCollectionsLists("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
+            //TODO() comparar con los archivos locales y descargar los que falten
+            sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
+        } catch (e: Exception) {
+            sharedViewModel.setProgressBarState(LoadingState.FAILURE)
+        }
 
         //Observe the selected file URI from the ViewModel
-        mainActivityViewModel.selectedFileUri.observe(this) { fileUri ->
-            fileUri?.let {
-                // Handle the selected file URI here
-                Snackbar.make(binding.root, "Selected file: $fileUri", Snackbar.LENGTH_SHORT).show()
-                // Reset the selected file URI to avoid processing it again
-                mainActivityViewModel.resetSelectedFileUri()
-            }
-        }
+//        sharedViewModel.selectedFileUri.observe(this) { fileUri ->
+//            fileUri?.let {
+//                // Handle the selected file URI here
+//                Snackbar.make(binding.root, "Selected file: $fileUri", Snackbar.LENGTH_SHORT).show()
+//                // Reset the selected file URI to avoid processing it again
+//                sharedViewModel.resetSelectedFileUri()
+//            }
+//        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mainActivityViewModel.screenState.removeObservers(this)
+        sharedViewModel.screenState.removeObservers(this)
     }
 
     fun startFileSelectionActivity() {
@@ -99,7 +110,7 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val fileUri: Uri? = data?.data
             // Pass the selected file URI to the ViewModel
-            mainActivityViewModel.setSelectedFileUri(fileUri)
+//            sharedViewModel.setSelectedFileUri(fileUri)
         }
     }
 }

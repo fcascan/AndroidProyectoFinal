@@ -31,10 +31,10 @@
         android:name="com.fcascan.proyectofinal.ui.item_details.ItemDetailFragment"
         android:label="ItemDetailFragment" >
         <argument
-            android:name="editPermissions"
+            android:name="paramEditPermissions"
             app:argType="boolean" />
         <argument
-            android:name="itemId"
+            android:name="paramItemId"
             app:argType="string"
             app:nullable="true" />
     </fragment>
