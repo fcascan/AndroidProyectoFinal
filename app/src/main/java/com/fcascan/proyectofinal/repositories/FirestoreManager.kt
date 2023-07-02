@@ -7,6 +7,7 @@ import com.fcascan.proyectofinal.constants.ITEMS_COLLECTION
 import com.fcascan.proyectofinal.entities.Category
 import com.fcascan.proyectofinal.entities.Group
 import com.fcascan.proyectofinal.entities.Item
+import com.fcascan.proyectofinal.enums.Result
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -37,61 +38,52 @@ class FirestoreManager {
         } catch (e: Exception) {
             Log.d("$_className - getCollectionByUserID", "Error Message: ${e.message}")
         }
-        return null
+        return MutableList(0) { "" }
     }
 
     //CRUD:
-    fun <T : Any> addObjectToCollection(thing: T, collection: String, callback: (String?) -> Unit) {
+    suspend fun <T : Any> addObjectToCollection(thing: T, collection: String, callback: (Result) -> Unit) {
         Log.d("$_className - addObjectToCollection", "thing: $thing - collection: $collection")
         try {
-            when (collection) {
+            val classType = when (collection) {
                 ITEMS_COLLECTION -> Item::class.java
                 CATEGORIES_COLLECTION -> Category::class.java
                 GROUPS_COLLECTION -> Group::class.java
                 else -> throw Exception("Invalid collection name")
             }
-            _db.collection(collection)
+            val documentID = _db.collection(collection)
                 .add(thing)
-                .addOnSuccessListener { documentReference ->
-                    Log.d("$_className - addObjectToCollection", "DocumentSnapshot added with ID: ${documentReference.id}")
-                    val thingId = documentReference.id
-                    callback(thingId)
-                }
-                .addOnFailureListener { exception ->
-                    Log.d("$_className - addObjectToCollection", "Error Message: ${exception.message}")
-                    callback(null)
-                }
+                .await()
+                .get().result?.id
+            Log.d("$_className - addObjectToCollection", "Item added to FireStore with ID ${documentID}")
+            callback(Result.SUCCESS)
         } catch (e: Exception) {
             Log.d("$_className - addObjectToCollection", "Error Message: ${e.message}")
         }
     }
 
-    fun <T : Any> updateObjectInCollection(thing: T, collection: String, callback: (Boolean) -> Unit) {
+    suspend fun <T : Any> updateObjectInCollection(thing: T, collection: String, callback: (Result) -> Unit) {
         Log.d("$_className - updateObjectInCollection", "thing: $thing - collection: $collection")
         try {
-            when (collection) {
-                ITEMS_COLLECTION -> Item::class.java
-                CATEGORIES_COLLECTION -> Category::class.java
-                GROUPS_COLLECTION -> Group::class.java
+            val documentId = when (collection) {
+                ITEMS_COLLECTION -> (thing as Item).documentId
+                CATEGORIES_COLLECTION -> (thing as Category).documentId
+                GROUPS_COLLECTION -> (thing as Group).documentId
                 else -> throw Exception("Invalid collection name")
             }
             _db.collection(collection)
-                .document((thing as DocumentSnapshot).id)
+                .document(documentId!!)
                 .set(thing)
-                .addOnSuccessListener {
-                    Log.d("$_className - updateObjectInCollection", "DocumentSnapshot successfully updated!")
-                    callback(true)
-                }
-                .addOnFailureListener { exception ->
-                    Log.d("$_className - updateObjectInCollection", "Error Message: ${exception.message}")
-                    callback(false)
-                }
+                .await()
+            Log.d("$_className - updateObjectInCollection", "Item successfully updated in FireStore")
+            callback(Result.SUCCESS)
         } catch (e: Exception) {
             Log.d("$_className - updateObjectInCollection", "Error Message: ${e.message}")
+            callback(Result.FAILURE)
         }
     }
 
-    fun deleteObjectFromCollection(thing: DocumentSnapshot, collection: String, callback: (Boolean) -> Unit) {
+    suspend fun deleteObjectFromCollection(thing: DocumentSnapshot, collection: String, callback: (Boolean) -> Unit) {
         Log.d("$_className - deleteObjectFromCollection", "thing: $thing - collection: $collection")
         try {
             when (collection) {

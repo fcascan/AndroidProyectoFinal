@@ -3,13 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@id/navigation_dashboard">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.fcascan.proyectofinal.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_actions"
+        android:name="com.fcascan.proyectofinal.ui.actions.ActionsFragment"
+        android:label="@string/title_actions"
+        tools:layout="@layout/fragment_actions" >
+        <action
+            android:id="@+id/action_navigation_actions_to_recordingFragment"
+            app:destination="@id/recordingFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
@@ -38,4 +42,9 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/recordingFragment"
+        android:name="com.fcascan.proyectofinal.ui.recording.RecordingFragment"
+        android:label="fragment_recording"
+        tools:layout="@layout/fragment_recording" />
 </navigation>

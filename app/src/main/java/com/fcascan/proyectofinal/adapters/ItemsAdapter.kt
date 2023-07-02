@@ -1,9 +1,11 @@
 package com.fcascan.proyectofinal.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
@@ -14,8 +16,9 @@ class ItemsAdapter(
     private var onClick: (Int) -> Unit,
     private var onLongClick: (Int) -> Unit,
     private var onPlayClicked: (Int) -> Unit,
+    private var onPauseClicked: (Int) -> Unit,
     private var onStopClicked: (Int) -> Unit,
-    private var onShareClicked: (Int) -> Unit
+    private var onShareClicked: (Int) -> Unit,
 ) : RecyclerView.Adapter<ItemsAdapter.ItemsHolder>() {
     private lateinit var context: Context
 
@@ -27,12 +30,12 @@ class ItemsAdapter(
         }
 
         fun setTitle(title: String) {
-            val txtTitle: TextView = view.findViewById(R.id.txtCardTitle)
+            val txtTitle: TextView = view.findViewById(R.id.txtItemCardTitle)
             txtTitle.text = title
         }
 
         fun setDescription(description: String) {
-            val txtDescription: TextView = view.findViewById(R.id.txtCardDescription)
+            val txtDescription: TextView = view.findViewById(R.id.txtItemCardDescription)
             txtDescription.text = description
         }
 
@@ -41,15 +44,25 @@ class ItemsAdapter(
         }
 
         fun getPlayButton(): View {
-            return view.findViewById(R.id.btnCardPlay)
+            return view.findViewById<Button>(R.id.btnItemCardPlay)
+        }
+
+        fun getPauseButton(): View {
+            return view.findViewById(R.id.btnItemCardPause)
         }
 
         fun getStopButton(): View {
-            return view.findViewById(R.id.btnCardStop)
+            return view.findViewById(R.id.btnItemCardStop)
         }
 
         fun getShareButton(): View {
-            return view.findViewById(R.id.btnCardShare)
+            return view.findViewById(R.id.btnItemCardShare)
+        }
+
+        fun resetPlayButton() {
+            getPlayButton().visibility = View.VISIBLE
+            getPauseButton().visibility = View.INVISIBLE
+            getStopButton().visibility = View.INVISIBLE
         }
     }
 
@@ -59,6 +72,13 @@ class ItemsAdapter(
 
         override fun toString(): String {
             return "${title}"
+        }
+    }
+
+    private fun resetAllPlayButtons(recyclerView: RecyclerView) {
+        for (i in 0 until itemCount) {
+            val viewHolder = recyclerView.findViewHolderForAdapterPosition(i) as ItemsHolder
+            viewHolder.resetPlayButton()
         }
     }
 
@@ -74,7 +94,8 @@ class ItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: ItemsHolder, index: Int) {
-//        holder.setImgItem(context, itemsList[index].imgItem)
+        holder.getPauseButton().visibility = View.INVISIBLE
+        holder.getStopButton().visibility = View.INVISIBLE
         holder.setTitle(itemsList[index].title)
         holder.setDescription(itemsList[index].description)
         holder.getCard().setOnClickListener {
@@ -85,9 +106,22 @@ class ItemsAdapter(
             true
         }
         holder.getPlayButton().setOnClickListener {
+            resetAllPlayButtons(holder.itemView.parent as RecyclerView)
+            holder.getPauseButton().visibility = View.VISIBLE
+            holder.getPlayButton().visibility = View.INVISIBLE
+            holder.getStopButton().visibility = View.VISIBLE
             onPlayClicked(index)
         }
+        holder.getPauseButton().setOnClickListener {
+            resetAllPlayButtons(holder.itemView.parent as RecyclerView)
+            holder.getPlayButton().visibility = View.VISIBLE
+            holder.getPauseButton().visibility = View.INVISIBLE
+            holder.getStopButton().visibility = View.VISIBLE
+            onPauseClicked(index)
+        }
         holder.getStopButton().setOnClickListener {
+            resetAllPlayButtons(holder.itemView.parent as RecyclerView)
+            holder.getStopButton().visibility = View.INVISIBLE
             onStopClicked(index)
         }
         holder.getShareButton().setOnClickListener {

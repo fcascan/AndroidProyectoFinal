@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.ProgressBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +17,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.fcascan.proyectofinal.enums.LoadingState
 import com.fcascan.proyectofinal.R
 import com.fcascan.proyectofinal.databinding.ActivityMainBinding
+import com.fcascan.proyectofinal.enums.Result
 import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.snackbar.Snackbar
 
@@ -39,9 +42,14 @@ class MainActivity : AppCompatActivity() {
         //View Binding:
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.hide()
+
+        //Initialize ViewModels:
         mainActivityViewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
-        supportActionBar?.hide()
+
+        //Set User:
+        sharedViewModel.setUser("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
 
         //BottomBar:
         val navView: BottomNavigationView = binding.navView
@@ -50,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_account
+                R.id.navigation_actions, R.id.navigation_dashboard, R.id.navigation_account
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -59,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         //ProgressBar:
         progressBarMainActivity = binding.root.findViewById(R.id.progressBarMainActivity)
         sharedViewModel.screenState.observe(this) { state ->
+            Log.d(_className, "screenState changed: $state")
             when (state) {
                 LoadingState.LOADING -> {
                     progressBarMainActivity.visibility = ProgressBar.VISIBLE
@@ -75,12 +84,13 @@ class MainActivity : AppCompatActivity() {
 
         //Retrieve data from Firebase:
         sharedViewModel.setProgressBarState(LoadingState.LOADING)
-        try {
-            sharedViewModel.updateAllCollectionsLists("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
-            //TODO() comparar con los archivos locales y descargar los que falten
-            sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
-        } catch (e: Exception) {
-            sharedViewModel.setProgressBarState(LoadingState.FAILURE)
+        sharedViewModel.initiateApp(this) {result ->
+            if(result == Result.SUCCESS)
+                sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
+            else {
+                Snackbar.make(binding.root, "FAILURE LOADING", Snackbar.LENGTH_LONG).show()
+                sharedViewModel.setProgressBarState(LoadingState.FAILURE)
+            }
         }
 
         //Observe the selected file URI from the ViewModel

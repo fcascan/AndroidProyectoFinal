@@ -5,6 +5,14 @@ const val ITEMS_COLLECTION = "Items"
 const val CATEGORIES_COLLECTION = "Categories"
 const val GROUPS_COLLECTION = "Groups"
 
+const val MAX_FILE_SIZE_BYTES: Long = 512 * 1024   //512KB
+
+
+//Actions:
+const val ACTION_SCREEN_ACTIONS = 1     //First Screen that lists the actions
+const val ACTION_SCREEN_CATEGORIES = 2  //Second Screen that lists the categories
+const val ACTION_SCREEN_GROUPS = 3      //Third Screen that lists the groups
+
 
 //Splash Screen:
 const val SPLASH_SCREEN_URL = "https://avatars.githubusercontent.com/u/64813436?v=4"

@@ -12,12 +12,41 @@ android:fillViewport="true">
         android:layout_height="wrap_content"
         tools:context=".ui.item_details.ItemDetailFragment">
 
+        <Button
+            android:id="@+id/btnBack"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="0dp"
+            android:paddingLeft="8dp"
+            android:iconTint="@color/design_default_color_primary"
+            app:icon="@drawable/ic_action_back"
+            app:iconSize="30dp"
+            app:layout_constraintBottom_toTopOf="@+id/txtItemDetailTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtActionsScreenTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:text="Item Details"
+            android:textColor="@color/design_default_color_primary"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="@+id/btnBack"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="@+id/btnBack" />
+
         <EditText
             android:id="@+id/txtItemDetailTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
             android:autofillHints="Title"
             android:hint="Title"
@@ -25,7 +54,7 @@ android:fillViewport="true">
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/btnBack" />
 
         <EditText
             android:id="@+id/txtItemDetailDescription"
@@ -119,6 +148,20 @@ android:fillViewport="true">
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <Button
+                    android:id="@+id/btnCardPause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:backgroundTint="@android:color/holo_green_light"
+                    app:icon="@drawable/ic_action_pause"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btnCardStop"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
                     android:id="@+id/btnCardPlay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -126,11 +169,13 @@ android:fillViewport="true">
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="24dp"
                     android:backgroundTint="@android:color/holo_green_light"
+                    android:paddingLeft="32dp"
                     app:icon="@drawable/ic_action_play"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btnCardStop"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
                 <Button
                     android:id="@+id/btnCardStop"
                     android:layout_width="wrap_content"
@@ -138,6 +183,7 @@ android:fillViewport="true">
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="24dp"
                     android:backgroundTint="@android:color/holo_red_light"
+                    android:paddingLeft="32dp"
                     app:icon="@drawable/ic_action_stop"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -147,67 +193,44 @@ android:fillViewport="true">
         </androidx.cardview.widget.CardView>
 
         <Button
-            android:id="@+id/btnSave"
+            android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/btn_light_green"
-            android:text="Save"
-            app:icon="@drawable/ic_action_save"
-            app:layout_constraintBottom_toTopOf="@+id/btnBack"
-            app:layout_constraintEnd_toEndOf="@+id/btnBack"
-            app:layout_constraintStart_toStartOf="@+id/btnBack"
-            app:layout_constraintTop_toBottomOf="@+id/playerLayout" />
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="32dp"
+            android:backgroundTint="@android:color/background_dark"
+            android:text="Delete"
+            app:icon="@drawable/ic_action_delete"
+            app:layout_constraintBottom_toBottomOf="@+id/btnClear"
+            app:layout_constraintEnd_toStartOf="@+id/btnClear"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/btnClear" />
 
         <Button
             android:id="@+id/btnClear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="48dp"
             android:text="Clear"
             app:icon="@drawable/ic_action_clear"
-            app:layout_constraintBottom_toTopOf="@+id/btnDelete"
-            app:layout_constraintEnd_toEndOf="@+id/btnDelete"
-            app:layout_constraintStart_toStartOf="@+id/btnDelete"
+            app:layout_constraintBottom_toTopOf="@+id/btnSave"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnDelete"
             app:layout_constraintTop_toBottomOf="@+id/playerLayout" />
 
         <Button
-            android:id="@+id/btnBack"
+            android:id="@+id/btnSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
-            android:layout_marginTop="128dp"
-            android:layout_marginBottom="24dp"
-            android:backgroundTint="@color/btn_light_red"
-            android:text="Back"
-            app:icon="@drawable/ic_action_back"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            android:backgroundTint="@color/btn_light_green"
+            android:text="Save"
+            app:icon="@drawable/ic_action_save"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/playerLayout"
-            app:layout_constraintVertical_bias="0.66" />
-
-        <Button
-            android:id="@+id/btnDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="48dp"
-            android:backgroundTint="@android:color/background_dark"
-            android:text="Delete"
-            app:icon="@drawable/ic_action_delete"
-            app:layout_constraintBottom_toBottomOf="@+id/btnBack"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/btnBack" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRecord"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            app:cornerRadius="46dp"
-            app:iconTint="@color/design_default_color_on_primary"
-            android:backgroundTint="@color/btn_light_orange"
-            app:icon="@drawable/ic_action_record"
-            style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
-            app:layout_constraintBottom_toTopOf="@+id/btnBack"
-            app:layout_constraintEnd_toEndOf="@+id/btnClear"
-            app:layout_constraintStart_toStartOf="@+id/btnSave"
-            app:layout_constraintTop_toBottomOf="@+id/btnSave" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnClear" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

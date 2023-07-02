@@ -9,10 +9,12 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -21,8 +23,10 @@ import com.fcascan.proyectofinal.R
 import com.fcascan.proyectofinal.activities.MainActivity
 import com.fcascan.proyectofinal.adapters.ItemsAdapter
 import com.fcascan.proyectofinal.enums.LoadingState
+import com.fcascan.proyectofinal.enums.PlaybackState
 import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.launch
 
 
 class DashboardFragment : Fragment() {
@@ -30,34 +34,31 @@ class DashboardFragment : Fragment() {
 
     //View Elements:
     private lateinit var v : View
+    private lateinit var txtNoContent: TextView
     private lateinit var searchViewDashboard: SearchView
     private lateinit var recyclerView: RecyclerView
     private lateinit var recViewAdapter: ItemsAdapter
     private lateinit var spinnerCategory: Spinner
     private lateinit var spinnerGroup: Spinner
-    private lateinit var fab: FloatingActionButton
 
     //ViewModels:
     private lateinit var dashboardViewModel: DashboardViewModel
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        //ViewModel:
-        dashboardViewModel = ViewModelProvider(requireActivity())[DashboardViewModel::class.java]
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        //ViewModel:
+        dashboardViewModel = ViewModelProvider(this)[DashboardViewModel::class.java]
+
         v = inflater.inflate(R.layout.fragment_dashboard, container, false)
+        txtNoContent = v.findViewById(R.id.txtNoContent)
         searchViewDashboard = v.findViewById(R.id.searchViewDashboard)
         recyclerView = v.findViewById(R.id.recViewDashboard)
         spinnerCategory = v.findViewById(R.id.spinnerCategory)
         spinnerGroup = v.findViewById(R.id.spinnerGroup)
-        fab = v.findViewById(R.id.fabDashboard)
 
         //RecyclerView Config:
         recyclerView.setHasFixedSize(false)
@@ -71,13 +72,22 @@ class DashboardFragment : Fragment() {
         //LiveData Observers:
         dashboardViewModel.recViewContent.observe(viewLifecycleOwner) {items ->
             Log.d("$_className - onViewCreated", "adapterList updated: ${items.toString()}")
+            if (items?.isEmpty() == true) { txtNoContent.visibility = View.VISIBLE }
+            else { txtNoContent.visibility = View.INVISIBLE }
             recViewAdapter = ItemsAdapter(
                 itemsList = items!!,
                 onClick = { index -> onCardClicked(index) },
                 onLongClick = { index -> onCardLongClicked(index) },
-                onPlayClicked = { index -> dashboardViewModel.onPlayClicked(index) },
-                onStopClicked = { index -> dashboardViewModel.onStopClicked(index) },
-                onShareClicked = { index -> dashboardViewModel.onShareClicked(index) }
+                onPlayClicked = { index ->
+                    sharedViewModel.playFile(dashboardViewModel.filteredItemsList[index].documentId!!, requireContext()) {
+                        Log.d("$_className - onViewCreated", "LALALA: $index")
+                        val viewHolder = recyclerView.findViewHolderForAdapterPosition(index) as ItemsAdapter.ItemsHolder
+                        viewHolder.resetPlayButton()
+                    }
+                },
+                onPauseClicked = { index -> sharedViewModel.pausePlayback() },
+                onStopClicked = { index -> sharedViewModel.stopPlayback() },
+                onShareClicked = { index -> dashboardViewModel.onShareClicked(index) },
             )
             recyclerView.layoutManager = GridLayoutManager(context, 2)
             recyclerView.adapter = recViewAdapter
@@ -118,22 +128,14 @@ class DashboardFragment : Fragment() {
         searchViewDashboard.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Log.d("$_className - onViewCreated", "searchViewDashboard pressed enter")
-                if (searchViewDashboard.query.toString().isNotEmpty()) {
-                    sharedViewModel.setProgressBarState(LoadingState.LOADING)
-                    dashboardViewModel.setSearchQuery(searchViewDashboard.query.toString())
-                    sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
-                    sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
-                }
+                dashboardViewModel.setSearchQuery(searchViewDashboard.query.toString())
+                sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
                 return false
             }
             override fun onQueryTextChange(newText: String?): Boolean {
                 Log.d("$_className - onViewCreated", "searchViewDashboard text changed")
-                if (searchViewDashboard.query.isNotEmpty()) {
-                    sharedViewModel.setProgressBarState(LoadingState.LOADING)
-                    dashboardViewModel.setSearchQuery(searchViewDashboard.query.toString())
-                    sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
-                    sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
-                }
+                dashboardViewModel.setSearchQuery(searchViewDashboard.query.toString())
+                sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
                 return false
             }
         })
@@ -141,47 +143,40 @@ class DashboardFragment : Fragment() {
         spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 Log.d("$_className - onViewCreated", "spinnerCategory Nothing selected: ${spinnerCategory.selectedItem}")
-                sharedViewModel.setProgressBarState(LoadingState.LOADING)
-                dashboardViewModel.setSelectedCategory(null)
+                dashboardViewModel.setSelectedCategory(0)
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
-                sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
             }
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 Log.d("$_className - onViewCreated", "spinnerCategory selected: ${spinnerCategory.selectedItem}")
-                sharedViewModel.setProgressBarState(LoadingState.LOADING)
-                dashboardViewModel.setSelectedCategory(spinnerCategory.selectedItem.toString())
+                dashboardViewModel.setSelectedCategory(spinnerCategory.selectedItemPosition)
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
-                sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
             }
         }
 
         spinnerGroup.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 Log.d("$_className - onViewCreated", "spinnerGroup Nothing selected: ${spinnerGroup.selectedItem}")
-                sharedViewModel.setProgressBarState(LoadingState.LOADING)
-                dashboardViewModel.setSelectedGroup(null)
+                dashboardViewModel.setSelectedGroup(0)
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
-                sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
             }
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 Log.d("$_className - onViewCreated", "spinnerGroup selected: ${spinnerGroup.selectedItem}")
-                sharedViewModel.setProgressBarState(LoadingState.LOADING)
-                dashboardViewModel.setSelectedGroup(spinnerGroup.selectedItem.toString())
+                dashboardViewModel.setSelectedGroup(spinnerGroup.selectedItemPosition)
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
-                sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
 
             }
         }
-
-//        fab.setOnClickListener {
-//            onFabClicked()
-//        }
     }
 
     override fun onStart() {
         super.onStart()
         populateAll()
         clearFilters()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dashboardViewModel.setSearchQuery("")
     }
 
     override fun onDestroyView() {
@@ -201,13 +196,14 @@ class DashboardFragment : Fragment() {
         }
         sharedViewModel.categoriesList.observe(this) { categories ->
             Log.d("$_className - populateAll", "categoriesList updated: ${categories.toString()}")
-            dashboardViewModel.updateSpinnerCategories(categories)
+            dashboardViewModel.updateCategoriesList(categories)
         }
         sharedViewModel.groupsList.observe(this) { groups ->
             Log.d("$_className - populateAll", "groupsList updated: ${groups.toString()}")
-            dashboardViewModel.updateSpinnerGroups(groups)
+            dashboardViewModel.updateGroupsList(groups)
         }
     }
+
     private fun clearFilters() {
         spinnerCategory.setSelection(0)
         spinnerGroup.setSelection(0)
@@ -232,14 +228,5 @@ class DashboardFragment : Fragment() {
         bundle.putString("paramItemId", dashboardViewModel.filteredItemsList[index].documentId.toString())
         Log.d("$_className - onCardLongClicked", "Redirecting to ItemDetailFragment with bundle: $bundle")
         Navigation.findNavController(v).navigate(R.id.action_navigation_dashboard_to_itemDetailFragment, bundle)
-    }
-
-    private fun onFabClicked() {
-        Log.d("$_className - onFabClicked", "Redirecting to AddItemFragment")
-        val bundle = Bundle()
-        bundle.putBoolean("paramEditPermissions", true)
-        bundle.putString("paramItemId", "")
-        Log.d("$_className - onFabClicked", "Redirecting to ItemDetailFragment with bundle: $bundle")
-        findNavController().navigate(R.id.action_navigation_dashboard_to_itemDetailFragment, bundle)
     }
 }
