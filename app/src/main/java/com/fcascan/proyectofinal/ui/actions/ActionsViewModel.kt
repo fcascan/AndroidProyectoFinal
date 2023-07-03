@@ -10,7 +10,7 @@ import com.fcascan.proyectofinal.enums.Actions
 import com.fcascan.proyectofinal.enums.ActionsScreen
 
 class ActionsViewModel : ViewModel() {
-    private val _className = "FCC#ActionsViewModel"
+    private val _TAG = "FCC#ActionsViewModel"
 
     private val _currentScreen = MutableLiveData<ActionsScreen>()
     val currentScreen: LiveData<ActionsScreen> get() = _currentScreen

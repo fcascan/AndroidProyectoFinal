@@ -10,7 +10,7 @@ import com.fcascan.proyectofinal.R
 import java.io.File
 
 class FileSelectActivity : AppCompatActivity() {
-    private val _className = "FCC#FileSelectActivity"
+    private val _TAG = "FCC#FileSelectActivity"
 
 //    https://developer.android.com/training/secure-file-sharing/share-file?hl=es-419
     private lateinit var privateRootDir: File   // The path to the root of this app's internal storage
@@ -26,10 +26,10 @@ class FileSelectActivity : AppCompatActivity() {
         privateRootDir = filesDir
         // Get the files/audios subdirectory;
         audiosDir = File(privateRootDir, "audios")
-        Log.d(_className, "audiosDir: $audiosDir")
+        Log.d(_TAG, "audiosDir: $audiosDir")
         // Get the files in the audios subdirectory
         audiosFiles = audiosDir.listFiles()
-        Log.d(_className, "audiosFiles: $audiosFiles")
+        Log.d(_TAG, "audiosFiles: $audiosFiles")
         // Set the Activity's result to null to begin with
         setResult(Activity.RESULT_CANCELED, null)
 
@@ -37,21 +37,21 @@ class FileSelectActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         // Handle back press to cancel file selection
-        Log.d("$_className - onBackPressed", "Clear Button Clicked")
+        Log.d("$_TAG - onBackPressed", "Clear Button Clicked")
         setResult(Activity.RESULT_CANCELED)
         super.onBackPressed()
     }
 
     override fun onDestroy() {
         // Handle activity destruction without file selection
-        Log.d("$_className - onDestroy", "File Select Cancelled")
+        Log.d("$_TAG - onDestroy", "File Select Cancelled")
         setResult(Activity.RESULT_CANCELED)
         super.onDestroy()
     }
 
     private fun selectFile(fileUri: Uri) {
         // Set up an Intent to send back to apps that request a file
-        Log.d("$_className - selectFile", "fileUri: $fileUri")
+        Log.d("$_TAG - selectFile", "fileUri: $fileUri")
         val resultIntent = Intent("android.intent.action.ACTION_RETURN_FILE").apply {
             data = fileUri
         }

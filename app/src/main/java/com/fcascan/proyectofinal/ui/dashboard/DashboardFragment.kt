@@ -27,10 +27,11 @@ import com.fcascan.proyectofinal.enums.PlaybackState
 import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 class DashboardFragment : Fragment() {
-    private val _className = "FCC#DashboardFragment"
+    private val _TAG = "FCC#DashboardFragment"
 
     //View Elements:
     private lateinit var v : View
@@ -69,9 +70,11 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val directory = File(requireContext().filesDir, "audios")
+
         //LiveData Observers:
         dashboardViewModel.recViewContent.observe(viewLifecycleOwner) {items ->
-            Log.d("$_className - onViewCreated", "adapterList updated: ${items.toString()}")
+            Log.d("$_TAG - onViewCreated", "adapterList updated: ${items.toString()}")
             if (items?.isEmpty() == true) { txtNoContent.visibility = View.VISIBLE }
             else { txtNoContent.visibility = View.INVISIBLE }
             recViewAdapter = ItemsAdapter(
@@ -79,8 +82,9 @@ class DashboardFragment : Fragment() {
                 onClick = { index -> onCardClicked(index) },
                 onLongClick = { index -> onCardLongClicked(index) },
                 onPlayClicked = { index ->
-                    sharedViewModel.playFile(dashboardViewModel.filteredItemsList[index].documentId!!, requireContext()) {
-                        Log.d("$_className - onViewCreated", "LALALA: $index")
+                    val file = File(directory, "${dashboardViewModel.filteredItemsList[index].documentId!!}.opus")
+                    sharedViewModel.playFile(file) {
+                        Log.d("$_TAG - onViewCreated", "Play Audio onCompletionListener index: $index")
                         val viewHolder = recyclerView.findViewHolderForAdapterPosition(index) as ItemsAdapter.ItemsHolder
                         viewHolder.resetPlayButton()
                     }
@@ -94,7 +98,7 @@ class DashboardFragment : Fragment() {
         }
 
         dashboardViewModel.spinnerCategoriesContent.observe(viewLifecycleOwner) {categories ->
-            Log.d("$_className - onViewCreated", "spinnerCategoriesContent updated: ${categories.toString()}")
+            Log.d("$_TAG - onViewCreated", "spinnerCategoriesContent updated: ${categories.toString()}")
             if (categories != null) {
                 categories.add(0, "all")
                 ArrayAdapter(
@@ -109,7 +113,7 @@ class DashboardFragment : Fragment() {
         }
 
         dashboardViewModel.spinnerGroupsContent.observe(viewLifecycleOwner) {groups ->
-            Log.d("$_className - onViewCreated", "spinnerGroupsContent updated: ${groups.toString()}")
+            Log.d("$_TAG - onViewCreated", "spinnerGroupsContent updated: ${groups.toString()}")
             if (groups != null) {
                 groups.add(0, "all")
                 ArrayAdapter(
@@ -127,13 +131,13 @@ class DashboardFragment : Fragment() {
         //Event Listeners:
         searchViewDashboard.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Log.d("$_className - onViewCreated", "searchViewDashboard pressed enter")
+                Log.d("$_TAG - onViewCreated", "searchViewDashboard pressed enter")
                 dashboardViewModel.setSearchQuery(searchViewDashboard.query.toString())
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
                 return false
             }
             override fun onQueryTextChange(newText: String?): Boolean {
-                Log.d("$_className - onViewCreated", "searchViewDashboard text changed")
+                Log.d("$_TAG - onViewCreated", "searchViewDashboard text changed")
                 dashboardViewModel.setSearchQuery(searchViewDashboard.query.toString())
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
                 return false
@@ -142,12 +146,12 @@ class DashboardFragment : Fragment() {
 
         spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                Log.d("$_className - onViewCreated", "spinnerCategory Nothing selected: ${spinnerCategory.selectedItem}")
+                Log.d("$_TAG - onViewCreated", "spinnerCategory Nothing selected: ${spinnerCategory.selectedItem}")
                 dashboardViewModel.setSelectedCategory(0)
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
             }
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                Log.d("$_className - onViewCreated", "spinnerCategory selected: ${spinnerCategory.selectedItem}")
+                Log.d("$_TAG - onViewCreated", "spinnerCategory selected: ${spinnerCategory.selectedItem}")
                 dashboardViewModel.setSelectedCategory(spinnerCategory.selectedItemPosition)
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
             }
@@ -155,12 +159,12 @@ class DashboardFragment : Fragment() {
 
         spinnerGroup.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                Log.d("$_className - onViewCreated", "spinnerGroup Nothing selected: ${spinnerGroup.selectedItem}")
+                Log.d("$_TAG - onViewCreated", "spinnerGroup Nothing selected: ${spinnerGroup.selectedItem}")
                 dashboardViewModel.setSelectedGroup(0)
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
             }
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                Log.d("$_className - onViewCreated", "spinnerGroup selected: ${spinnerGroup.selectedItem}")
+                Log.d("$_TAG - onViewCreated", "spinnerGroup selected: ${spinnerGroup.selectedItem}")
                 dashboardViewModel.setSelectedGroup(spinnerGroup.selectedItemPosition)
                 sharedViewModel.getItemsList()?.let { dashboardViewModel.filterRecViewContent(it) }
 
@@ -191,15 +195,15 @@ class DashboardFragment : Fragment() {
     //Private Functions:
     private fun populateAll() {
         sharedViewModel.itemsList.observe(this) { items ->
-            Log.d("$_className - populateAll", "itemsList updated: ${items.toString()}")
+            Log.d("$_TAG - populateAll", "itemsList updated: ${items.toString()}")
             dashboardViewModel.updateAdapterList(items)
         }
         sharedViewModel.categoriesList.observe(this) { categories ->
-            Log.d("$_className - populateAll", "categoriesList updated: ${categories.toString()}")
+            Log.d("$_TAG - populateAll", "categoriesList updated: ${categories.toString()}")
             dashboardViewModel.updateCategoriesList(categories)
         }
         sharedViewModel.groupsList.observe(this) { groups ->
-            Log.d("$_className - populateAll", "groupsList updated: ${groups.toString()}")
+            Log.d("$_TAG - populateAll", "groupsList updated: ${groups.toString()}")
             dashboardViewModel.updateGroupsList(groups)
         }
     }
@@ -213,20 +217,20 @@ class DashboardFragment : Fragment() {
 
     //Navigations:
     private fun onCardClicked(index: Int) {
-        Log.d("$_className - onCardClicked", "Clicked on card $index. Redirecting to ItemFragment (Read-Only)")
+        Log.d("$_TAG - onCardClicked", "Clicked on card $index. Redirecting to ItemFragment (Read-Only)")
         val bundle = Bundle()
         bundle.putBoolean("paramEditPermissions", false)
         bundle.putString("paramItemId", dashboardViewModel.filteredItemsList[index].documentId.toString())
-        Log.d("$_className - onCardClicked", "Redirecting to ItemDetailFragment with bundle: $bundle")
+        Log.d("$_TAG - onCardClicked", "Redirecting to ItemDetailFragment with bundle: $bundle")
         Navigation.findNavController(v).navigate(R.id.action_navigation_dashboard_to_itemDetailFragment, bundle)
     }
 
     private fun onCardLongClicked(index: Int) {
-        Log.d("$_className - onCardLongClicked", "LongClicked on card $index. Redirecting to ItemFragment (Edit-Mode)")
+        Log.d("$_TAG - onCardLongClicked", "LongClicked on card $index. Redirecting to ItemFragment (Edit-Mode)")
         val bundle = Bundle()
         bundle.putBoolean("paramEditPermissions", true)
         bundle.putString("paramItemId", dashboardViewModel.filteredItemsList[index].documentId.toString())
-        Log.d("$_className - onCardLongClicked", "Redirecting to ItemDetailFragment with bundle: $bundle")
+        Log.d("$_TAG - onCardLongClicked", "Redirecting to ItemDetailFragment with bundle: $bundle")
         Navigation.findNavController(v).navigate(R.id.action_navigation_dashboard_to_itemDetailFragment, bundle)
     }
 }

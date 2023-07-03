@@ -155,12 +155,12 @@ android:fillViewport="true">
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="24dp"
                     android:backgroundTint="@android:color/holo_green_light"
+                    android:paddingLeft="32dp"
                     app:icon="@drawable/ic_action_pause"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btnCardStop"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
                 <Button
                     android:id="@+id/btnCardPlay"
                     android:layout_width="wrap_content"
@@ -175,7 +175,6 @@ android:fillViewport="true">
                     app:layout_constraintEnd_toStartOf="@+id/btnCardStop"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
                 <Button
                     android:id="@+id/btnCardStop"
                     android:layout_width="wrap_content"
@@ -214,13 +213,13 @@ android:fillViewport="true">
             android:layout_marginEnd="48dp"
             android:text="Clear"
             app:icon="@drawable/ic_action_clear"
-            app:layout_constraintBottom_toTopOf="@+id/btnSave"
+            app:layout_constraintBottom_toTopOf="@+id/btnRecordingSave"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btnDelete"
             app:layout_constraintTop_toBottomOf="@+id/playerLayout" />
 
         <Button
-            android:id="@+id/btnSave"
+            android:id="@+id/btnRecordingSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"

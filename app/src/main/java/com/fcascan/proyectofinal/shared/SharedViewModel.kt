@@ -23,10 +23,11 @@ import com.fcascan.proyectofinal.repositories.StorageManager
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 class SharedViewModel : ViewModel() {
-    private val _className = "FCC#SharedViewModel"
+    private val _TAG = "FCC#SharedViewModel"
 
     //Repositories:
     private val _firestoreManager = FirestoreManager()
@@ -71,7 +72,7 @@ class SharedViewModel : ViewModel() {
             _storageManager.downloadCollectionByUserID(userID, context)
             onComplete(Result.SUCCESS)
         } catch (e: Exception) {
-            Log.e("$_className - initiateApp", "Exception: $e")
+            Log.e("$_TAG - initiateApp", "Exception: $e")
             onComplete(Result.FAILURE)
         }
     }
@@ -91,7 +92,7 @@ class SharedViewModel : ViewModel() {
     }
 
     fun saveItemOnEverywhere(item: Item, context: Context, onComplete: (Result) -> Unit) = viewModelScope.launch {
-        Log.d("$_className - saveItemOnEverywhere", "Saving item on everywhere...")
+        Log.d("$_TAG - saveItemOnEverywhere", "Saving item on everywhere...")
         //        TODO()
         //1) Guardar/Pisar como Item en la base de datos y recuperar el ID del documento
         _firestoreManager.addObjectToCollection(item, ITEMS_COLLECTION) { result ->
@@ -117,7 +118,7 @@ class SharedViewModel : ViewModel() {
     }
 
     fun wipeItemFromEverywhere(itemID: String, context: Context, onComplete: (Result) -> Unit) = viewModelScope.launch {
-        Log.d("$_className - wipeItemFromEverywhere", "Wiping item from everywhere...")
+        Log.d("$_TAG - wipeItemFromEverywhere", "Wiping item from everywhere...")
         //        TODO()
         //1) Borrar el item de la base de datos
         //2) Borrar el archivo de audio de la carpeta de la app
@@ -130,23 +131,23 @@ class SharedViewModel : ViewModel() {
 
 
     //MediaPlayer Methods:
-    fun playFile(fileName: String, context: Context, onPlaybackComplete: () -> Unit) = viewModelScope.launch {
-        Log.d("$_className - playFile", "Playing file: $fileName")
+    fun playFile(file: File, onPlaybackComplete: () -> Unit) = viewModelScope.launch {
+        Log.d("$_TAG - playFile", "Playing file: ${file.absolutePath}")
         setPlaybackState(PlaybackState.PLAYING)
-        _playbackManager.playContentUri(fileName, context) {
+        _playbackManager.playContentUri(file) {
             setPlaybackState(PlaybackState.STOPPED)
             onPlaybackComplete()
         }
     }
 
     fun pausePlayback() {
-        Log.d("$_className - pausePlayback", "Pause playback clicked")
+        Log.d("$_TAG - pausePlayback", "Pause playback clicked")
         setPlaybackState(PlaybackState.PAUSED)
         _playbackManager.pausePlayback()
     }
 
     fun stopPlayback() {
-        Log.d("$_className - stopPlayback", "Stop playback clicked")
+        Log.d("$_TAG - stopPlayback", "Stop playback clicked")
         setPlaybackState(PlaybackState.STOPPED)
         _playbackManager.stopPlayback()
     }

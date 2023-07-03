@@ -23,9 +23,10 @@ import com.fcascan.proyectofinal.enums.PlaybackState
 import com.fcascan.proyectofinal.enums.Result
 import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
 
 class ItemDetailFragment : Fragment() {
-    private val _className = "FCC#ItemDetailFragment"
+    private val _TAG = "FCC#ItemDetailFragment"
 
     //Input Parameters:
     private var editPermissions: Boolean? = null
@@ -56,8 +57,8 @@ class ItemDetailFragment : Fragment() {
 
         editPermissions = arguments?.getBoolean("paramEditPermissions")
         itemId = arguments?.getString("paramItemId")
-        Log.d("$_className - onCreate", "Received paramEditPermissions: $editPermissions")
-        Log.d("$_className - onCreate", "Received paramItemId: $itemId")
+        Log.d("$_TAG - onCreate", "Received paramEditPermissions: $editPermissions")
+        Log.d("$_TAG - onCreate", "Received paramItemId: $itemId")
     }
 
     override fun onCreateView(
@@ -78,7 +79,7 @@ class ItemDetailFragment : Fragment() {
         btnCardPlay = v.findViewById(R.id.btnCardPlay)
         btnCardPause = v.findViewById(R.id.btnCardPause)
         btnCardStop = v.findViewById(R.id.btnCardStop)
-        btnSave = v.findViewById(R.id.btnSave)
+        btnSave = v.findViewById(R.id.btnRecordingSave)
         btnClear = v.findViewById(R.id.btnClear)
         btnDelete = v.findViewById(R.id.btnDelete)
         return v
@@ -87,8 +88,10 @@ class ItemDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val directory = File(context?.filesDir, "audios")
+
         itemDetailViewModel.spinnerCategoriesContent.observe(viewLifecycleOwner) { categories ->
-            Log.d("$_className - onViewCreated", "spinnerCategoriesContent updated: $categories")
+            Log.d("$_TAG - onViewCreated", "spinnerCategoriesContent updated: $categories")
             if (categories != null) {
                 categories.add(0, "all")
                 ArrayAdapter(
@@ -108,7 +111,7 @@ class ItemDetailFragment : Fragment() {
         }
 
         itemDetailViewModel.spinnerGroupsContent.observe(viewLifecycleOwner) { groups ->
-            Log.d("$_className - onViewCreated", "spinnerGroupsContent updated: $groups")
+            Log.d("$_TAG - onViewCreated", "spinnerGroupsContent updated: $groups")
             if (groups != null) {
                 groups.add(0, "all")
                 ArrayAdapter(
@@ -137,18 +140,19 @@ class ItemDetailFragment : Fragment() {
             findNavController().navigateUp()
         }
         btnCardPlay.setOnClickListener {
-            isPlaying()
-            sharedViewModel.playFile(txtFileName.text.toString(), requireContext()) {
-                Log.d("$_className - onViewCreated", "Playback finished")
-                isStopped()
+            playbackStarted()
+            val file = File(directory, "${txtFileName.text.toString()}.opus")
+            sharedViewModel.playFile(file) {
+                Log.d("$_TAG - onViewCreated", "Playback finished")
+                playbackStopped()
             }
         }
         btnCardPause.setOnClickListener {
-            isPaused()
+            playbackPaused()
             sharedViewModel.pausePlayback()
         }
         btnCardStop.setOnClickListener {
-            isStopped()
+            playbackStopped()
             sharedViewModel.stopPlayback()
         }
         btnSave.setOnClickListener {
@@ -171,32 +175,32 @@ class ItemDetailFragment : Fragment() {
     }
 
     private fun changeButtonsStateWithPlayback(playbackState: PlaybackState?) {
-        Log.d("$_className - changeButtonsStateWithPlayback", "playbackState: $playbackState")
+        Log.d("$_TAG - changeButtonsStateWithPlayback", "playbackState: $playbackState")
         when (playbackState) {
-            PlaybackState.PLAYING -> { isPlaying() }
-            PlaybackState.PAUSED -> { isPaused() }
-            PlaybackState.STOPPED -> { isStopped() }
+            PlaybackState.PLAYING -> { playbackStarted() }
+            PlaybackState.PAUSED -> { playbackPaused() }
+            PlaybackState.STOPPED -> { playbackStopped() }
             else -> {
-                Log.d("$_className - onViewCreated", "PlaybackState: $playbackState")
-                isStopped()
+                Log.d("$_TAG - onViewCreated", "PlaybackState: $playbackState")
+                playbackStopped()
                 Snackbar.make(v, "PlaybackState: $playbackState", Snackbar.LENGTH_LONG).show()
             }
         }
     }
 
     private fun populateSpinners() {
-        Log.d("$_className - populateSpinners", "Populating Spinners")
+        Log.d("$_TAG - populateSpinners", "Populating Spinners")
         sharedViewModel.categoriesList.observe(viewLifecycleOwner) { categories ->
-            Log.d("$_className - populateAll", "categoriesList updated: ${categories.toString()}")
+            Log.d("$_TAG - populateAll", "categoriesList updated: ${categories.toString()}")
             itemDetailViewModel.updateSpinnerCategories(categories)
         }
         sharedViewModel.groupsList.observe(viewLifecycleOwner) { groups ->
-            Log.d("$_className - populateAll", "groupsList updated: ${groups.toString()}")
+            Log.d("$_TAG - populateAll", "groupsList updated: ${groups.toString()}")
             itemDetailViewModel.updateSpinnerGroups(groups)
         }
     }
     private fun populateFields() {
-        Log.d("$_className - populateFields", "Populate Fields")
+        Log.d("$_TAG - populateFields", "Populate Fields")
         //Primero buscar en la lista el item con el id
         val item = itemId?.let { sharedViewModel.getItemById(it) }
         if (item != null) {
@@ -206,7 +210,7 @@ class ItemDetailFragment : Fragment() {
             spinnerItemDetailGroup.setSelection(sharedViewModel.getGroupIndexByID(item.groupID))
             txtFileName.setText(item.documentId)
         } else {
-            Log.d("$_className - populateFields", "Item not found")
+            Log.d("$_TAG - populateFields", "Item not found")
             clearFields()
         }
     }
@@ -215,7 +219,7 @@ class ItemDetailFragment : Fragment() {
         val adapter = spinner.adapter
         for (i in 0 until adapter.count) {
             if (adapter.getItem(i) == selection) {
-                Log.d("$_className - setSpinnerSelection", "Setting Spinner Selection: $selection")
+                Log.d("$_TAG - setSpinnerSelection", "Setting Spinner Selection: $selection")
                 spinner.setSelection(i)
                 break
             }
@@ -223,7 +227,7 @@ class ItemDetailFragment : Fragment() {
     }
 
     private fun editPermissionsCheck() {
-        Log.d("$_className - editPermissionsCheck", "Edit Permissions Check: $editPermissions")
+        Log.d("$_TAG - editPermissionsCheck", "Edit Permissions Check: $editPermissions")
         if(editPermissions != true) {
             txtItemDetailScreenTitle.text = "Item Details (read-only)"
             txtItemDetailTitle.focusable = View.NOT_FOCUSABLE
@@ -236,32 +240,32 @@ class ItemDetailFragment : Fragment() {
         }
     }
 
-    fun isPlaying() {
+    fun playbackStarted() {
         btnCardPlay.visibility = View.INVISIBLE
         btnCardPause.visibility = View.VISIBLE
         btnCardStop.visibility = View.VISIBLE
     }
 
-    fun isPaused() {
+    fun playbackPaused() {
         btnCardPlay.visibility = View.VISIBLE
         btnCardPause.visibility = View.INVISIBLE
         btnCardStop.visibility = View.VISIBLE
     }
 
-    fun isStopped() {
+    fun playbackStopped() {
         btnCardPlay.visibility = View.VISIBLE
         btnCardPause.visibility = View.INVISIBLE
         btnCardStop.visibility = View.INVISIBLE
     }
 
     fun onSelectFileClicked() {
-        Log.d("$_className - onSelectFileClicked", "Select File Button Clicked")
+        Log.d("$_TAG - onSelectFileClicked", "Select File Button Clicked")
         //Ejecutar startFileSelectionActivity de MainActivity
 //        TODO()
     }
 
     private fun onSavedClicked() {
-        Log.d("$_className - onSavedClicked", "Save Button Clicked")
+        Log.d("$_TAG - onSavedClicked", "Save Button Clicked")
         sharedViewModel.setProgressBarState(LoadingState.LOADING)
         val itemToSave = Item(
             itemId.toString(),
@@ -273,11 +277,11 @@ class ItemDetailFragment : Fragment() {
         )
         sharedViewModel.updateItem(itemToSave, requireContext()) { result ->
             if (result == Result.SUCCESS) {
-                Log.d("$_className - onSavedClicked", "Successfully saved")
+                Log.d("$_TAG - onSavedClicked", "Successfully saved")
                 Snackbar.make(v, "Successfully saved", Snackbar.LENGTH_SHORT).show()
                 sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
             } else {
-                Log.d("$_className - onSavedClicked", "Error saving")
+                Log.d("$_TAG - onSavedClicked", "Error saving")
                 Snackbar.make(v, "Error saving", Snackbar.LENGTH_LONG).show()
                 sharedViewModel.setProgressBarState(LoadingState.FAILURE)
             }
@@ -286,23 +290,23 @@ class ItemDetailFragment : Fragment() {
     }
 
     private fun onClearClicked() {
-        Log.d("$_className - onClearClicked", "Clear Button Clicked")
+        Log.d("$_TAG - onClearClicked", "Clear Button Clicked")
         clearFields()
     }
 
     private fun onDeleteClicked() {
-        Log.d("$_className - onDeleteClicked", "Delete Button Clicked")
+        Log.d("$_TAG - onDeleteClicked", "Delete Button Clicked")
         val dialogBuilder = AlertDialog.Builder(context)
         dialogBuilder.setTitle("Delete Item")
             .setMessage("Are you sure you want to delete this item?")
             .setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
                 sharedViewModel.wipeItemFromEverywhere(itemId.toString(), requireContext()) { result ->
                     if (result == Result.SUCCESS) {
-                        Log.d("$_className - onDeleteClicked", "Item deleted")
+                        Log.d("$_TAG - onDeleteClicked", "Item deleted")
                         Snackbar.make(v, "Successfully erased", Snackbar.LENGTH_SHORT).show()
                         sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
                     } else {
-                        Log.d("$_className - onDeleteClicked", "Error deleting item")
+                        Log.d("$_TAG - onDeleteClicked", "Error deleting item")
                         Snackbar.make(v, "Error deleting", Snackbar.LENGTH_LONG).show()
                         sharedViewModel.setProgressBarState(LoadingState.FAILURE)
                     }

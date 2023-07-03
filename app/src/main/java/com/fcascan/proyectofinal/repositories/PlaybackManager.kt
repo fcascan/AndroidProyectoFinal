@@ -11,7 +11,7 @@ import java.io.File
 import java.io.IOException
 
 class PlaybackManager {
-    private val _className = "FCC#PlaybackManager"
+    private val _TAG = "FCC#PlaybackManager"
 
     private var mediaPlayer: MediaPlayer = MediaPlayer()
 
@@ -28,18 +28,16 @@ class PlaybackManager {
         setPlaybackState(PlaybackState.STOPPED)
     }
 
-    fun playContentUri(filename: String, context: Context, onPlaybackComplete: () -> Unit) {
-        Log.d("$_className - playContentUri", "filename: $filename")
-        val directory = File(context.filesDir, "audios")
-        val file = File(directory, "${filename}.opus")
-        if (getPlaybackState() == PlaybackState.PLAYING && currentFilePlaying == filename) {
+    fun playContentUri(file: File, onPlaybackComplete: () -> Unit) {
+        Log.d("$_TAG - playContentUri", "filename: ${file.name}")
+        if (getPlaybackState() == PlaybackState.PLAYING && currentFilePlaying == file.name) {
             pausePlayback()
             return
         }
-        if(getPlaybackState() == PlaybackState.PLAYING && currentFilePlaying != filename) {
+        if(getPlaybackState() == PlaybackState.PLAYING && currentFilePlaying != file.name) {
             stopPlayback()
         }
-        if (getPlaybackState() == PlaybackState.PAUSED && currentFilePlaying == filename) {
+        if (getPlaybackState() == PlaybackState.PAUSED && currentFilePlaying == file.name) {
             resumePlayback()
             return
         }
@@ -53,7 +51,7 @@ class PlaybackManager {
                     .build()
             )
             mediaPlayer.setOnCompletionListener {
-                Log.d("$_className - playContentUri", "Playback completed")
+                Log.d("$_TAG - playContentUri", "Playback completed")
                 setPlaybackState(PlaybackState.STOPPED)
                 currentFilePlaying = ""
                 onPlaybackComplete()
@@ -61,16 +59,16 @@ class PlaybackManager {
             mediaPlayer.prepare()
             mediaPlayer.start()
             setPlaybackState(PlaybackState.PLAYING)
-            currentFilePlaying = filename
+            currentFilePlaying = file.name
         } catch (exception: IOException) {
-            Log.e("$_className - playContentUri", "Exception: $exception")
+            Log.e("$_TAG - playContentUri", "Exception: $exception")
             setPlaybackState(PlaybackState.ERROR)
             mediaPlayer.release()
         }
     }
 
     private fun resumePlayback() {
-        Log.d("$_className - resumePlayback", "Resuming playback of ${currentFilePlaying}")
+        Log.d("$_TAG - resumePlayback", "Resuming playback of ${currentFilePlaying}")
         try {
             if (!mediaPlayer.isPlaying) {
                 mediaPlayer.start()
@@ -83,7 +81,7 @@ class PlaybackManager {
     }
 
     fun pausePlayback() {
-        Log.d("$_className - pausePlayback", "Pausing playback...")
+        Log.d("$_TAG - pausePlayback", "Pausing playback...")
         try {
             if (mediaPlayer.isPlaying) {
                 mediaPlayer.pause()
@@ -96,7 +94,7 @@ class PlaybackManager {
     }
 
     fun stopPlayback() {
-        Log.d("$_className - stopPlayback", "Stopping playback...")
+        Log.d("$_TAG - stopPlayback", "Stopping playback...")
         try {
             mediaPlayer.stop()
             mediaPlayer.reset()
@@ -117,7 +115,7 @@ class PlaybackManager {
 
     //Private Methods:
     private fun setPlaybackState(state: PlaybackState) {
-        Log.d("$_className - setPlaybackState", "PlaybackState: $state")
+        Log.d("$_TAG - setPlaybackState", "PlaybackState: $state")
         _playBackState.value = state
     }
 

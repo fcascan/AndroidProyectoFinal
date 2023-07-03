@@ -22,7 +22,7 @@ import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ActionsFragment : Fragment() {
-    private val _className = "FCC#ActionsFragment"
+    private val _TAG = "FCC#ActionsFragment"
 
     //View Elements:
     private lateinit var v : View
@@ -69,7 +69,7 @@ class ActionsFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackCallback)
 
         actionsViewModel.recViewContent.observe(viewLifecycleOwner) { content ->
-            Log.d("$_className - onViewCreated", "RecViewContent changed")
+            Log.d("$_TAG - onViewCreated", "RecViewContent changed")
             recViewAdapter = ActionsAdapter(
                 actionsList = content!!,
                 onClick = { index -> onCardClicked(index) },
@@ -80,7 +80,7 @@ class ActionsFragment : Fragment() {
         }
 
         actionsViewModel.currentScreen.observe(viewLifecycleOwner) { screen ->
-            Log.d("$_className - onViewCreated", "CurrentScreen changed")
+            Log.d("$_TAG - onViewCreated", "CurrentScreen changed")
             actionsViewModel.changeRecViewContent()
             when(screen) {
                 ActionsScreen.SCREEN_ACTIONS -> {
@@ -102,7 +102,7 @@ class ActionsFragment : Fragment() {
                     recyclerView.layoutManager = GridLayoutManager(context, 2)
                 }
                 else -> {
-                    Log.e("$_className - onViewCreated", "Error: CurrentScreen not detected")
+                    Log.e("$_TAG - onViewCreated", "Error: CurrentScreen not detected")
                     actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_ACTIONS)
                 }
             }
@@ -110,20 +110,20 @@ class ActionsFragment : Fragment() {
 
 
         fabActions.setOnClickListener {
-            Log.d("$_className - onViewCreated", "FAB clicked")
+            Log.d("$_TAG - onViewCreated", "FAB clicked")
             when(actionsViewModel.currentScreen.value) {
                 ActionsScreen.SCREEN_ACTIONS -> { /*TODO()*/ }
                 ActionsScreen.SCREEN_CATEGORIES -> { /*TODO()*/ }
                 ActionsScreen.SCREEN_GROUPS -> { /*TODO()*/ }
                 else -> {
-                    Log.e("$_className - onViewCreated", "Error: CurrentScreen not detected")
+                    Log.e("$_TAG - onViewCreated", "Error: CurrentScreen not detected")
                     actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_ACTIONS)
                 }
             }
         }
 
         btnBack.setOnClickListener {
-            Log.d("$_className - onViewCreated", "Back button clicked")
+            Log.d("$_TAG - onViewCreated", "Back button clicked")
             onBackPressed()
         }
     }
@@ -131,11 +131,11 @@ class ActionsFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         sharedViewModel.categoriesList.observe(this) { categories ->
-            Log.d("$_className - populateAll", "categoriesList updated: ${categories.toString()}")
+            Log.d("$_TAG - populateAll", "categoriesList updated: ${categories.toString()}")
             actionsViewModel.updateCategoriesList(categories)
         }
         sharedViewModel.groupsList.observe(this) { groups ->
-            Log.d("$_className - populateAll", "groupsList updated: ${groups.toString()}")
+            Log.d("$_TAG - populateAll", "groupsList updated: ${groups.toString()}")
             actionsViewModel.updateGroupsList(groups)
         }
     }
@@ -143,7 +143,7 @@ class ActionsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_ACTIONS)
-        Log.d("$_className - onResume", "Current Screen: ${actionsViewModel.currentScreen.value?.title}")
+        Log.d("$_TAG - onResume", "Current Screen: ${actionsViewModel.currentScreen.value?.title}")
     }
 
     override fun onDestroyView() {
@@ -157,13 +157,13 @@ class ActionsFragment : Fragment() {
             ActionsScreen.SCREEN_CATEGORIES -> { actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_ACTIONS) }
             ActionsScreen.SCREEN_GROUPS -> { actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_ACTIONS) }
             else -> {
-                Log.e("$_className - onViewCreated", "Error: CurrentScreen not detected")
+                Log.e("$_TAG - onViewCreated", "Error: CurrentScreen not detected")
                 actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_ACTIONS)
             }
         }
     }
     private fun onCardClicked(index: Int) {
-        Log.d("$_className - onCardClicked", "Current Screen: ${actionsViewModel.currentScreen.value?.title}. Clicked on card $index")
+        Log.d("$_TAG - onCardClicked", "Current Screen: ${actionsViewModel.currentScreen.value?.title}. Clicked on card $index")
         when(actionsViewModel.currentScreen.value) {
             ActionsScreen.SCREEN_ACTIONS -> {
                 when(index) {
@@ -172,7 +172,7 @@ class ActionsFragment : Fragment() {
                     2 -> { actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_CATEGORIES) }
                     3 -> { actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_GROUPS) }
                     else -> {
-                        Log.e("$_className - onCardClicked", "Error: Index out of bounds")
+                        Log.e("$_TAG - onCardClicked", "Error: Index out of bounds")
                         actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_ACTIONS)
                     }
                 }
@@ -180,32 +180,32 @@ class ActionsFragment : Fragment() {
             ActionsScreen.SCREEN_CATEGORIES -> { /* navigate to category detail screen (read-only) //TODO() */ }
             ActionsScreen.SCREEN_GROUPS -> { /* navigate to group detail screen (read-only) */ }
             else -> {
-                Log.e("$_className - onCardClicked", "Error: CurrentScreen not detected")
+                Log.e("$_TAG - onCardClicked", "Error: CurrentScreen not detected")
                 actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_ACTIONS)
             }
         }
     }
 
     private fun onCardLongClicked(index: Int) {
-        Log.d("$_className - onCardLongClicked", "Current Screen: ${actionsViewModel.currentScreen.value?.title}. Long clicked on card $index.")
-        Log.d("$_className - onCardClicked", "Current Screen: ${actionsViewModel.currentScreen.value?.title}. Clicked on card $index")
+        Log.d("$_TAG - onCardLongClicked", "Current Screen: ${actionsViewModel.currentScreen.value?.title}. Long clicked on card $index.")
+        Log.d("$_TAG - onCardClicked", "Current Screen: ${actionsViewModel.currentScreen.value?.title}. Clicked on card $index")
         when(actionsViewModel.currentScreen.value) {
             ActionsScreen.SCREEN_ACTIONS -> { /* do nothing */ }
             ActionsScreen.SCREEN_CATEGORIES -> { /* navigate to category detail screen (edit-mode) //TODO() */ }
             ActionsScreen.SCREEN_GROUPS -> { /* navigate to group detail screen (edit-mode) */ }
             else -> {
-                Log.e("$_className - onCardClicked", "Error: CurrentScreen not detected")
+                Log.e("$_TAG - onCardClicked", "Error: CurrentScreen not detected")
                 actionsViewModel.setCurrentScreen(ActionsScreen.SCREEN_ACTIONS)
             }
         }
     }
 
     private fun onFabClicked() {
-        Log.d("$_className - onFabClicked", "Redirecting to CategoryGroupItemFragment")
+        Log.d("$_TAG - onFabClicked", "Redirecting to CategoryGroupItemFragment")
         val bundle = Bundle()
         bundle.putBoolean("paramEditPermissions", true)
         bundle.putString("paramItemId", "")
-        Log.d("$_className - onFabClicked", "Redirecting to CategoryGroupDetailFragment with bundle: $bundle")
+        Log.d("$_TAG - onFabClicked", "Redirecting to CategoryGroupDetailFragment with bundle: $bundle")
 //        findNavController().navigate(R.id.action_navigation_actions_to_categoryGroupDetailFragment, bundle)
     }
 }

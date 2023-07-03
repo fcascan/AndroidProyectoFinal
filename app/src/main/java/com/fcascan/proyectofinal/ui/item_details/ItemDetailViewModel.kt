@@ -7,19 +7,19 @@ import com.fcascan.proyectofinal.entities.Category
 import com.fcascan.proyectofinal.entities.Group
 
 class ItemDetailViewModel : ViewModel() {
-    private val _className = "FCC#ItemDetailViewModel"
+    private val _TAG = "FCC#ItemDetailViewModel"
 
     //LiveData for the View:
     var spinnerCategoriesContent: MutableLiveData<MutableList<String>?> = MutableLiveData()
     var spinnerGroupsContent: MutableLiveData<MutableList<String>?> = MutableLiveData()
 
     fun updateSpinnerCategories(list: MutableList<Category>?) {
-        Log.d("$_className - updateSpinnerCategories", "Updating Categories Spinner Content")
+        Log.d("$_TAG - updateSpinnerCategories", "Updating Categories Spinner Content")
         spinnerCategoriesContent.postValue(list?.map { it.name }?.toMutableList())
     }
 
     fun updateSpinnerGroups(list: MutableList<Group>?) {
-        Log.d("$_className - updateSpinnerGroups", "Updating Groups Spinner Content")
+        Log.d("$_TAG - updateSpinnerGroups", "Updating Groups Spinner Content")
         spinnerGroupsContent.postValue(list?.map { it.name }?.toMutableList())
     }
 }

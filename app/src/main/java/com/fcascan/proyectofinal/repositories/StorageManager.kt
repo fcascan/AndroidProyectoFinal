@@ -9,37 +9,37 @@ import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 
 class StorageManager {
-    private val _className = "FCC#StorageManager"
+    private val _TAG = "FCC#StorageManager"
 
     private val _storage = Firebase.storage
     private val _filesManager = FilesManager()
 
     suspend fun downloadCollectionByUserID(userID: String, context: Context) {
         //path: /{userID}/{itemID}.opus
-        Log.d("$_className - downloadCollectionByUserID", "Downloading...")
+        Log.d("$_TAG - downloadCollectionByUserID", "Downloading...")
         _storage.reference
             .child(userID)
             .listAll()
             .await().also{ listResult ->
                 listResult.items.forEach { item ->
-                    Log.d("$_className - downloadCollectionByUserID", "item: $item")
+                    Log.d("$_TAG - downloadCollectionByUserID", "item: $item")
                     val fileName = item.name
                     item.getBytes(MAX_FILE_SIZE_BYTES)
                         .addOnSuccessListener { bytes ->
                             _filesManager.insertFileIntoInternalMemory(bytes, fileName, context)
                         }
                         .addOnFailureListener { exception ->
-                            Log.e("$_className - downloadCollectionByUserID", "Failed to download item: $item, Exception: $exception")
+                            Log.e("$_TAG - downloadCollectionByUserID", "Failed to download item: $item, Exception: $exception")
                         }
                 }
             }
 //            .addOnFailureListener { exception ->
-//                Log.e("$_className - downloadCollectionByUserID", "Failed to list items, Exception: $exception")
+//                Log.e("$_TAG - downloadCollectionByUserID", "Failed to list items, Exception: $exception")
 //            }
     }
 
     suspend fun uploadFile(path: String, callback: (String?) -> Unit) {
-        Log.d("$_className - uploadFile", "path: $path")
+        Log.d("$_TAG - uploadFile", "path: $path")
         val storageRef = _storage.reference
         val fileRef = storageRef.child(path)
         fileRef.putFile(path.toUri())
@@ -52,7 +52,7 @@ class StorageManager {
     }
 
     suspend fun downloadFile(path: String, callback: (String?) -> Unit) {
-        Log.d("$_className - downloadFile", "path: $path")
+        Log.d("$_TAG - downloadFile", "path: $path")
         val storageRef = _storage.reference
         val fileRef = storageRef.child(path)
         fileRef.downloadUrl
@@ -65,7 +65,7 @@ class StorageManager {
     }
 
     suspend fun deleteFile(path: String, callback: (Boolean) -> Unit) {
-        Log.d("$_className - deleteFile", "path: $path")
+        Log.d("$_TAG - deleteFile", "path: $path")
         val storageRef = _storage.reference
         val fileRef = storageRef.child(path)
         fileRef.delete()

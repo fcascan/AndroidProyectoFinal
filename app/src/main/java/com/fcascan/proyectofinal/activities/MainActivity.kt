@@ -1,7 +1,10 @@
 package com.fcascan.proyectofinal.activities
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +12,8 @@ import android.view.View
 import android.widget.ProgressBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -22,7 +27,7 @@ import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
-    private val _className = "FCC#MainActivity"
+    private val _TAG = "FCC#MainActivity"
 
     //View Elements:
     private lateinit var binding: ActivityMainBinding
@@ -51,6 +56,9 @@ class MainActivity : AppCompatActivity() {
         //Set User:
         sharedViewModel.setUser("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
 
+        //Checkpermissions:
+        checkPermissions()
+
         //BottomBar:
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
@@ -67,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         //ProgressBar:
         progressBarMainActivity = binding.root.findViewById(R.id.progressBarMainActivity)
         sharedViewModel.screenState.observe(this) { state ->
-            Log.d(_className, "screenState changed: $state")
+            Log.d(_TAG, "screenState changed: $state")
             when (state) {
                 LoadingState.LOADING -> {
                     progressBarMainActivity.visibility = ProgressBar.VISIBLE
@@ -107,6 +115,33 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         sharedViewModel.screenState.removeObservers(this)
+    }
+
+    fun checkPermissions() {
+        Log.d("$_TAG - checkForPermissions", "Checking for permissions...")
+        val RECORD_AUDIO_PERMISSION_REQUEST_CODE = 100
+        val RECORD_STORAGE_PERMISSION_REQUEST_CODE = 101
+        val recordAudioPermission = Manifest.permission.RECORD_AUDIO
+        val storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE  //Includes READ_EXTERNAL_STORAGE
+        val granted = PackageManager.PERMISSION_GRANTED
+
+        val audioPermissionGranted = ContextCompat.checkSelfPermission(this, recordAudioPermission) == granted
+        val storagePermissionGranted = ContextCompat.checkSelfPermission(this, storagePermission) == granted
+
+        if (audioPermissionGranted && storagePermissionGranted) {
+            Log.d("$_TAG - checkForPermissions", "Permissions already granted")
+        } else {
+            Log.d("$_TAG - checkForPermissions", "Asking for permissions")
+            val permissionsToRequest = mutableListOf<String>()
+            if (!audioPermissionGranted) {
+                permissionsToRequest.add(recordAudioPermission)
+            }
+            if (!storagePermissionGranted) {
+                permissionsToRequest.add(storagePermission)
+            }
+            ActivityCompat.requestPermissions(this, permissionsToRequest.toTypedArray(), RECORD_AUDIO_PERMISSION_REQUEST_CODE)
+            //TODO() Handle the result of the user denying the permissions
+        }
     }
 
     fun startFileSelectionActivity() {

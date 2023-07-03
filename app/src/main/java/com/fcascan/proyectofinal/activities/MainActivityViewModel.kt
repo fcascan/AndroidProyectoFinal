@@ -24,22 +24,7 @@ import kotlinx.coroutines.tasks.await
 
 
 class MainActivityViewModel : ViewModel() {
-    private val _className = "FCC#MainActivityViewModel"
-
-    //Firebase & Storage:
-
-
-    //LiveData Variables:
-//    val screenState = MutableLiveData<LoadingState>()
-//    var itemsList: MutableLiveData<MutableList<Item>> = MutableLiveData()
-//    var categoriesList: MutableLiveData<MutableList<Category>> = MutableLiveData()
-//    var groupsList: MutableLiveData<MutableList<Group>> = MutableLiveData()
-
-//    private val _selectedFileUri = MutableLiveData<Uri?>()
-//    val selectedFileUri: LiveData<Uri?> get() = _selectedFileUri
-
-
-    //Public functions:
+    private val _TAG = "FCC#MainActivityViewModel"
 
 
     //Files Management Functions:
@@ -55,7 +40,7 @@ class MainActivityViewModel : ViewModel() {
 //        val storageRef = _storage.reference
 //        val fileRef = storageRef.child("$userID/$collection/$fileName")
 //        val uri = fileRef.downloadUrl.await()
-//        Log.d("$_className - retrieveURIfromFile", "URI: $uri")
+//        Log.d("$_TAG - retrieveURIfromFile", "URI: $uri")
 //    }
 
 

@@ -9,7 +9,7 @@ import com.fcascan.proyectofinal.entities.Group
 import com.fcascan.proyectofinal.entities.Item
 
 class DashboardViewModel : ViewModel() {
-    private val _className = "FCC#DashboardViewModel"
+    private val _TAG = "FCC#DashboardViewModel"
 
     //LiveData for the View:
     var recViewContent: MutableLiveData<MutableList<ItemsAdapter.ItemObject>?> = MutableLiveData()
@@ -29,22 +29,22 @@ class DashboardViewModel : ViewModel() {
 
     //Public functions for the FragmentView:
     fun onShareClicked(index: Int) {
-        Log.d("$_className - onShareClicked", "Sharing item ${filteredItemsList[index].title}")
+        Log.d("$_TAG - onShareClicked", "Sharing item ${filteredItemsList[index].title}")
 //        TODO()
     }
 
     fun setSearchQuery(query: String?) {
-        Log.d("$_className - setSearchQuery", "Query: $query")
+        Log.d("$_TAG - setSearchQuery", "Query: $query")
         seachQuery = query ?: ""
     }
 
     fun setSelectedCategory(index: Int) {
-        Log.d("$_className - setSelectedCategory", "Index: $index")
+        Log.d("$_TAG - setSelectedCategory", "Index: $index")
         selectedCategoryIndex = index
     }
 
     fun setSelectedGroup(index: Int) {
-        Log.d("$_className - setSelectedGroup", "Index: $index")
+        Log.d("$_TAG - setSelectedGroup", "Index: $index")
         selectedGroupIndex = index
     }
 
@@ -52,7 +52,7 @@ class DashboardViewModel : ViewModel() {
     fun filterRecViewContent(itemsList: MutableList<Item>) {
         val selectedCategory = if(selectedCategoryIndex > 0) categoriesList?.get(selectedCategoryIndex-1) else null
         val selectedGroup = if(selectedGroupIndex > 0) groupsList?.get(selectedGroupIndex-1) else null
-        Log.d("$_className - filterRecViewContent", "Query: $seachQuery - Category: $selectedCategory - Group: $selectedGroup")
+        Log.d("$_TAG - filterRecViewContent", "Query: $seachQuery - Category: $selectedCategory - Group: $selectedGroup")
         val filteredList1: MutableList<Item> =
             if (seachQuery.isNotEmpty()) {
                 itemsList.filter { it.title!!.contains(seachQuery, ignoreCase = true) || it.description!!.contains(seachQuery, ignoreCase = true)} as MutableList<Item>
@@ -72,48 +72,48 @@ class DashboardViewModel : ViewModel() {
                 filteredList2
             }
         filteredItemsList = filteredList3
-        Log.d("$_className - filterRecViewContent", "filteredItemsList: $filteredItemsList")
+        Log.d("$_TAG - filterRecViewContent", "filteredItemsList: $filteredItemsList")
         recViewContent.postValue(convertItemsListToAdapterList(filteredItemsList))
     }
 
     fun updateAdapterList(itemsList: MutableList<Item>?) {
-        Log.d("$_className - updateAdapterList", "itemsList: $itemsList")
+        Log.d("$_TAG - updateAdapterList", "itemsList: $itemsList")
         if (itemsList.isNullOrEmpty()) {
-            Log.d("$_className - updateAdapterList", "itemsList is null or empty")
+            Log.d("$_TAG - updateAdapterList", "itemsList is null or empty")
             recViewContent.postValue(MutableList(0) { ItemsAdapter.ItemObject("", "") })
             return
         }
         val convertedList = convertItemsListToAdapterList(itemsList.toMutableList())
-        Log.d("$_className - updateAdapterList", "convertedList: $convertedList")
+        Log.d("$_TAG - updateAdapterList", "convertedList: $convertedList")
         recViewContent.postValue(convertedList)
     }
 
     fun updateCategoriesList(list: MutableList<Category>?) {
-        Log.d("$_className - updateCategoriesList", "list: $list")
+        Log.d("$_TAG - updateCategoriesList", "list: $list")
         categoriesList = list
         updateSpinnerCategories()
     }
 
     fun updateGroupsList(list: MutableList<Group>?) {
-        Log.d("$_className - updateGroupsList", "list: $list")
+        Log.d("$_TAG - updateGroupsList", "list: $list")
         groupsList = list
         updateSpinnerGroups()
     }
 
     private fun updateSpinnerCategories() {
-        Log.d("$_className - updateSpinnerCategories", "Updating Categories Spinner Content")
+        Log.d("$_TAG - updateSpinnerCategories", "Updating Categories Spinner Content")
         spinnerCategoriesContent.postValue(categoriesList?.map { it.name }?.toMutableList())
     }
 
     private fun updateSpinnerGroups() {
-        Log.d("$_className - updateSpinnerGroups", "Updating Groups Spinner Content")
+        Log.d("$_TAG - updateSpinnerGroups", "Updating Groups Spinner Content")
         spinnerGroupsContent.postValue(groupsList?.map { it.name }?.toMutableList())
     }
 
     private fun convertItemsListToAdapterList(itemsList: MutableList<Item>?): MutableList<ItemsAdapter.ItemObject>? {
-        Log.d("$_className - convertItemsListToAdapterList", "itemsList: $itemsList")
+        Log.d("$_TAG - convertItemsListToAdapterList", "itemsList: $itemsList")
         if (itemsList.isNullOrEmpty()) {
-            Log.d("$_className - convertItemsListToAdapterList", "itemsList is null or empty")
+            Log.d("$_TAG - convertItemsListToAdapterList", "itemsList is null or empty")
             return MutableList(0) { ItemsAdapter.ItemObject("", "") }
         }
         return itemsList.map { ItemsAdapter.ItemObject(it.title!!, it.description!!) } as? MutableList<ItemsAdapter.ItemObject>

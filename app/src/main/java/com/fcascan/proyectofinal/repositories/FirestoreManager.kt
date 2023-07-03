@@ -14,13 +14,13 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 class FirestoreManager {
-    val _className = "FCC#FirestoreManager"
+    val _TAG = "FCC#FirestoreManager"
 
     val _db = Firebase.firestore
 
     //Coroutines:
     suspend fun getCollectionByUserID(userID: String, collection: String): MutableList<out Any>? {
-        Log.d("$_className - getCollectionByUserID", "Retrieving $collection collection...")
+        Log.d("$_TAG - getCollectionByUserID", "Retrieving $collection collection...")
         try {
             val classType = when (collection) {
                 ITEMS_COLLECTION -> Item::class.java
@@ -33,17 +33,17 @@ class FirestoreManager {
                 .get()
                 .await()
                 .toObjects(classType)
-            Log.d("$_className - getCollectionByUserID", "$collection data retrieved: ${data}")
+            Log.d("$_TAG - getCollectionByUserID", "$collection data retrieved: ${data}")
             return data
         } catch (e: Exception) {
-            Log.d("$_className - getCollectionByUserID", "Error Message: ${e.message}")
+            Log.d("$_TAG - getCollectionByUserID", "Error Message: ${e.message}")
         }
         return MutableList(0) { "" }
     }
 
     //CRUD:
     suspend fun <T : Any> addObjectToCollection(thing: T, collection: String, callback: (Result) -> Unit) {
-        Log.d("$_className - addObjectToCollection", "thing: $thing - collection: $collection")
+        Log.d("$_TAG - addObjectToCollection", "thing: $thing - collection: $collection")
         try {
             val classType = when (collection) {
                 ITEMS_COLLECTION -> Item::class.java
@@ -55,15 +55,15 @@ class FirestoreManager {
                 .add(thing)
                 .await()
                 .get().result?.id
-            Log.d("$_className - addObjectToCollection", "Item added to FireStore with ID ${documentID}")
+            Log.d("$_TAG - addObjectToCollection", "Item added to FireStore with ID ${documentID}")
             callback(Result.SUCCESS)
         } catch (e: Exception) {
-            Log.d("$_className - addObjectToCollection", "Error Message: ${e.message}")
+            Log.d("$_TAG - addObjectToCollection", "Error Message: ${e.message}")
         }
     }
 
     suspend fun <T : Any> updateObjectInCollection(thing: T, collection: String, callback: (Result) -> Unit) {
-        Log.d("$_className - updateObjectInCollection", "thing: $thing - collection: $collection")
+        Log.d("$_TAG - updateObjectInCollection", "thing: $thing - collection: $collection")
         try {
             val documentId = when (collection) {
                 ITEMS_COLLECTION -> (thing as Item).documentId
@@ -75,16 +75,16 @@ class FirestoreManager {
                 .document(documentId!!)
                 .set(thing)
                 .await()
-            Log.d("$_className - updateObjectInCollection", "Item successfully updated in FireStore")
+            Log.d("$_TAG - updateObjectInCollection", "Item successfully updated in FireStore")
             callback(Result.SUCCESS)
         } catch (e: Exception) {
-            Log.d("$_className - updateObjectInCollection", "Error Message: ${e.message}")
+            Log.d("$_TAG - updateObjectInCollection", "Error Message: ${e.message}")
             callback(Result.FAILURE)
         }
     }
 
     suspend fun deleteObjectFromCollection(thing: DocumentSnapshot, collection: String, callback: (Boolean) -> Unit) {
-        Log.d("$_className - deleteObjectFromCollection", "thing: $thing - collection: $collection")
+        Log.d("$_TAG - deleteObjectFromCollection", "thing: $thing - collection: $collection")
         try {
             when (collection) {
                 ITEMS_COLLECTION -> Item::class.java
@@ -96,20 +96,20 @@ class FirestoreManager {
                 .document(thing.id)
                 .delete()
                 .addOnSuccessListener {
-                    Log.d("$_className - deleteObjectFromCollection", "DocumentSnapshot successfully deleted!")
+                    Log.d("$_TAG - deleteObjectFromCollection", "DocumentSnapshot successfully deleted!")
                     callback(true)
                 }
                 .addOnFailureListener { exception ->
-                    Log.d("$_className - deleteObjectFromCollection", "Error Message: ${exception.message}")
+                    Log.d("$_TAG - deleteObjectFromCollection", "Error Message: ${exception.message}")
                     callback(false)
                 }
         } catch (e: Exception) {
-            Log.d("$_className - deleteObjectFromCollection", "Error Message: ${e.message}")
+            Log.d("$_TAG - deleteObjectFromCollection", "Error Message: ${e.message}")
         }
     }
 
     inline fun <reified T> getObjectFromCollectionByID(id: String, collection: String, crossinline callback: (T?) -> Unit) {
-        Log.d("$_className - getObjectFromCollectionByID", "id: $id - collection: $collection")
+        Log.d("$_TAG - getObjectFromCollectionByID", "id: $id - collection: $collection")
         try {
             val classType = when (collection) {
                 ITEMS_COLLECTION -> Item::class.java
@@ -125,11 +125,11 @@ class FirestoreManager {
                     callback(thing)
                 }
                 .addOnFailureListener { exception ->
-                    Log.d("$_className - getObjectFromCollectionByID", "Error Message: ${exception.message}")
+                    Log.d("$_TAG - getObjectFromCollectionByID", "Error Message: ${exception.message}")
                     callback(null)
                 }
         } catch (e: Exception) {
-            Log.d("$_className - getObjectFromCollectionByID", "Error Message: ${e.message}")
+            Log.d("$_TAG - getObjectFromCollectionByID", "Error Message: ${e.message}")
         }
     }
 }

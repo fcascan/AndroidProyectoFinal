@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.fcascan.proyectofinal.databinding.FragmentAccountBinding
 
 class AccountFragment : Fragment() {
-    private val _className = "FCC#AccountFragment"
+    private val _TAG = "FCC#AccountFragment"
     private var _binding: FragmentAccountBinding? = null
 
     // This property is only valid between onCreateView and
