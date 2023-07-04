@@ -238,6 +238,7 @@ class FileReceiverActivity : AppCompatActivity() {
         if (intent == null) setResult(Activity.RESULT_CANCELED, intent)
         val audioUri: Uri? = intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri
         if (audioUri != null) {
+            binding.txtFileName.setText( audioUri.path?.substringAfterLast("/"))
             val inputStream = this.contentResolver.openInputStream(audioUri)
             if (inputStream != null) {
                 receivedFile.outputStream().use { outputStream ->
