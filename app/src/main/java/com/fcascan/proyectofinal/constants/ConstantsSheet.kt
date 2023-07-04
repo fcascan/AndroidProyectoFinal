@@ -5,8 +5,11 @@ const val ITEMS_COLLECTION = "Items"
 const val CATEGORIES_COLLECTION = "Categories"
 const val GROUPS_COLLECTION = "Groups"
 
+//File size:
 const val MAX_FILE_SIZE_BYTES: Long = 512 * 1024   //512KB
 
+//Auth:
+const val AUTH_DAYS_TO_EXPIRE_LOGIN = 30L
 
 //Actions:
 const val ACTION_SCREEN_ACTIONS = 1     //First Screen that lists the actions

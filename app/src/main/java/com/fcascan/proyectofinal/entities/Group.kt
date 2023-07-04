@@ -9,6 +9,6 @@ class Group(
     var name: String = "",
 ) {
     override fun toString(): String {
-        return """$documentId - $name"""
+        return """Group{id: $documentId, name: $name}"""
     }
 }

@@ -1,6 +1,7 @@
 package com.fcascan.proyectofinal.ui.dashboard
 
 import android.util.Log
+import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fcascan.proyectofinal.adapters.ItemsAdapter
@@ -28,11 +29,6 @@ class DashboardViewModel : ViewModel() {
 
 
     //Public functions for the FragmentView:
-    fun onShareClicked(index: Int) {
-        Log.d("$_TAG - onShareClicked", "Sharing item ${filteredItemsList[index].title}")
-//        TODO()
-    }
-
     fun setSearchQuery(query: String?) {
         Log.d("$_TAG - setSearchQuery", "Query: $query")
         seachQuery = query ?: ""

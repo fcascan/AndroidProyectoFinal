@@ -12,6 +12,6 @@ data class Item(
     var groupID: String? = null
 ) {
     override fun toString(): String {
-        return """$documentId - $title"""
+        return """Item{id: $documentId, title: $title}"""
     }
 }

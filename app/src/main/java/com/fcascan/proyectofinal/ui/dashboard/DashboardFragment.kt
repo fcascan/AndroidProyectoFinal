@@ -1,5 +1,7 @@
 package com.fcascan.proyectofinal.ui.dashboard
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.SearchView
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.core.content.FileProvider
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -91,7 +94,11 @@ class DashboardFragment : Fragment() {
                 },
                 onPauseClicked = { index -> sharedViewModel.pausePlayback() },
                 onStopClicked = { index -> sharedViewModel.stopPlayback() },
-                onShareClicked = { index -> dashboardViewModel.onShareClicked(index) },
+                onShareClicked = { index ->
+                    val file = File(directory, "${dashboardViewModel.filteredItemsList[index].documentId!!}.opus")
+                    val fileUri = FileProvider.getUriForFile(requireContext(), "com.fcascan.proyectofinal.fileprovider", file)
+                    onShareClicked(fileUri)
+                },
             )
             recyclerView.layoutManager = GridLayoutManager(context, 2)
             recyclerView.adapter = recViewAdapter
@@ -232,5 +239,18 @@ class DashboardFragment : Fragment() {
         bundle.putString("paramItemId", dashboardViewModel.filteredItemsList[index].documentId.toString())
         Log.d("$_TAG - onCardLongClicked", "Redirecting to ItemDetailFragment with bundle: $bundle")
         Navigation.findNavController(v).navigate(R.id.action_navigation_dashboard_to_itemDetailFragment, bundle)
+    }
+
+    fun onShareClicked(fileUri: Uri) {
+        Log.d("$_TAG - onShareClicked", "Sharing fileUri: ${fileUri}")
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "audio/opus"
+        shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri)
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        val chooserIntent = Intent.createChooser(shareIntent, "Share via")
+        if (shareIntent.resolveActivity(requireContext().packageManager) != null) {
+            startActivity(chooserIntent)
+        }
     }
 }

@@ -20,8 +20,6 @@ import com.fcascan.proyectofinal.repositories.PlaybackManager
 import com.fcascan.proyectofinal.repositories.FilesManager
 import com.fcascan.proyectofinal.repositories.FirestoreManager
 import com.fcascan.proyectofinal.repositories.StorageManager
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -64,12 +62,12 @@ class SharedViewModel : ViewModel() {
 
     //One-time Methods:
     fun initiateApp(context: Context, onComplete: (Result) -> Unit) = viewModelScope.launch {
-        val userID = getUser()
         try {
             setItemsList(_firestoreManager.getCollectionByUserID(userID, ITEMS_COLLECTION) as MutableList<Item>)
             setCategoriesList(_firestoreManager.getCollectionByUserID(userID, CATEGORIES_COLLECTION) as MutableList<Category>)
             setGroupsList(_firestoreManager.getCollectionByUserID(userID, GROUPS_COLLECTION) as MutableList<Group>)
             _storageManager.downloadCollectionByUserID(userID, context)
+            _filesManager.checkFoldersExistence(File(context.filesDir, ""))
             onComplete(Result.SUCCESS)
         } catch (e: Exception) {
             Log.e("$_TAG - initiateApp", "Exception: $e")
@@ -79,36 +77,45 @@ class SharedViewModel : ViewModel() {
 
 
     //Public Methods:
-    fun setUser(userID: String) {
+    fun setUserID(userID: String) {
         _userID = userID
-    }
-
-    fun getUser(): String {
-        return _userID
     }
 
     fun setProgressBarState(screenState: LoadingState) {
         _screenState.value = screenState
     }
 
-    fun saveItemOnEverywhere(item: Item, context: Context, onComplete: (Result) -> Unit) = viewModelScope.launch {
+    fun saveItemOnEverywhere(item: Item, rootDirectory: File, onComplete: (Result) -> Unit) = viewModelScope.launch {
         Log.d("$_TAG - saveItemOnEverywhere", "Saving item on everywhere...")
-        //        TODO()
-        //1) Guardar/Pisar como Item en la base de datos y recuperar el ID del documento
-        _firestoreManager.addObjectToCollection(item, ITEMS_COLLECTION) { result ->
-            if (result == Result.FAILURE) {
+        var documentID: String? = null
+        //1) Save as new Item in Firebase and get the document ID
+        _firestoreManager.addObjectToCollection(item, ITEMS_COLLECTION) { result, docID ->
+            if (result == Result.FAILURE || docID == null) {
+                Log.e("$_TAG - saveItemOnEverywhere", "Error saving item in Firestore")
                 onComplete(result)
+            } else {
+                Log.d("$_TAG - saveItemOnEverywhere", "Item saved successfully with documentID: $docID")
+                documentID = docID
             }
         }
 
-        //2) Guardar en Storage con el nombre del ID del documento
-//        _storageManager.uploadFile(item.documentId, )
+        //2) Change audio file name with the documentID and move it to the audios folder
+        val file = File(rootDirectory, "recordings/recorded_audio.aac")
+        val newFile = File(rootDirectory, "audios/$documentID.aac")
+        _filesManager.renameFile(file, newFile)
 
-        //3) Guardar el archivo de audio en la carpeta de la app
-//        _filesManager.insertFileIntoInternalMemory(byteArray, item.documentId, context)
-
-        //4) Volver a la pantalla anterior
-
+        //3) Then save the file in Storage with userID as Folder:
+        val storagePath = "${userID}/$documentID.opus"
+        _storageManager.uploadFile(newFile, storagePath) { result ->
+            if (result == Result.FAILURE) {
+                Log.e("$_TAG - saveItemOnEverywhere", "Error saving file in Storage")
+                onComplete(result)
+            } else {
+                Log.d("$_TAG - saveItemOnEverywhere", "File saved successfully in Storage")
+                onComplete(result)
+            }
+        }
+        //4) Refresh the lists and then NavigateUp
     }
 
     fun updateItem(item: Item, context: Context, onComplete: (Result) -> Unit) = viewModelScope.launch {

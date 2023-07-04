@@ -9,6 +9,6 @@ class Category(
     var name: String = "",
 ) {
     override fun toString(): String {
-        return """$documentId - $name"""
+        return """Category{id: $documentId, title: $name}"""
     }
 }

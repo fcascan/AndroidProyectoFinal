@@ -2,13 +2,11 @@ package com.fcascan.proyectofinal.activities
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.ProgressBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +23,7 @@ import com.fcascan.proyectofinal.databinding.ActivityMainBinding
 import com.fcascan.proyectofinal.enums.Result
 import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.snackbar.Snackbar
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private val _TAG = "FCC#MainActivity"
@@ -53,8 +52,9 @@ class MainActivity : AppCompatActivity() {
         mainActivityViewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
 
-        //Set User:
-        sharedViewModel.setUser("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
+        //Hardcode User:
+        sharedViewModel.setUserID("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
+        //TODO() Set User: AUTH
 
         //Checkpermissions:
         checkPermissions()
@@ -100,21 +100,18 @@ class MainActivity : AppCompatActivity() {
                 sharedViewModel.setProgressBarState(LoadingState.FAILURE)
             }
         }
-
-        //Observe the selected file URI from the ViewModel
-//        sharedViewModel.selectedFileUri.observe(this) { fileUri ->
-//            fileUri?.let {
-//                // Handle the selected file URI here
-//                Snackbar.make(binding.root, "Selected file: $fileUri", Snackbar.LENGTH_SHORT).show()
-//                // Reset the selected file URI to avoid processing it again
-//                sharedViewModel.resetSelectedFileUri()
-//            }
-//        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         sharedViewModel.screenState.removeObservers(this)
+        finish()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        finish()
+        exitProcess(0)
     }
 
     fun checkPermissions() {
@@ -142,11 +139,6 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, permissionsToRequest.toTypedArray(), RECORD_AUDIO_PERMISSION_REQUEST_CODE)
             //TODO() Handle the result of the user denying the permissions
         }
-    }
-
-    fun startFileSelectionActivity() {
-        val intent = Intent(this, FileSelectActivity::class.java)
-        startActivityForResult(intent, REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

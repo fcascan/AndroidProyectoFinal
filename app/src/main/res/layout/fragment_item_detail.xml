@@ -125,12 +125,15 @@ android:fillViewport="true">
 
         <EditText
             android:id="@+id/txtFileName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
+            android:layout_marginEnd="24dp"
             android:ems="10"
             android:inputType="text"
-            android:text="filename.ogg"
+            android:text="documentID.opus"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/spinnerItemDetailGroup"
             app:layout_constraintTop_toBottomOf="@+id/spinnerItemDetailGroup" />
 

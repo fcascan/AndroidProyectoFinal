@@ -47,4 +47,9 @@
         android:name="com.fcascan.proyectofinal.ui.recording.RecordingFragment"
         android:label="fragment_recording"
         tools:layout="@layout/fragment_recording" />
+    <activity
+        android:id="@+id/fileReceiverActivity"
+        android:name="com.fcascan.proyectofinal.activities.FileReceiverActivity"
+        android:label="activity_file_receiver"
+        tools:layout="@layout/activity_file_receiver" />
 </navigation>

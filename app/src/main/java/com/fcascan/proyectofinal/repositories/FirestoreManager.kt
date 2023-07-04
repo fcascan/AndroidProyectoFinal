@@ -42,7 +42,7 @@ class FirestoreManager {
     }
 
     //CRUD:
-    suspend fun <T : Any> addObjectToCollection(thing: T, collection: String, callback: (Result) -> Unit) {
+    suspend fun <T : Any> addObjectToCollection(thing: T, collection: String, callback: (Result, String?) -> Unit) {
         Log.d("$_TAG - addObjectToCollection", "thing: $thing - collection: $collection")
         try {
             val classType = when (collection) {
@@ -54,9 +54,8 @@ class FirestoreManager {
             val documentID = _db.collection(collection)
                 .add(thing)
                 .await()
-                .get().result?.id
-            Log.d("$_TAG - addObjectToCollection", "Item added to FireStore with ID ${documentID}")
-            callback(Result.SUCCESS)
+            Log.d("$_TAG - addObjectToCollection", "Item added to FireStore with ID ${documentID.id}")
+            callback(Result.SUCCESS, documentID.id)
         } catch (e: Exception) {
             Log.d("$_TAG - addObjectToCollection", "Error Message: ${e.message}")
         }
