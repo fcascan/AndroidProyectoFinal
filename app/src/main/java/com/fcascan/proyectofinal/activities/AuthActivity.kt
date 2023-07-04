@@ -67,6 +67,7 @@ class AuthActivity : AppCompatActivity() {
                 redirect()
             }
         }
+
         authActivityViewModel.currentDate.observe(this) { date ->
             Log.d(_TAG, "currentDate changed: $date")
             if (date != null) {

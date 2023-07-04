@@ -1,7 +1,6 @@
 package com.fcascan.proyectofinal.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -71,14 +70,16 @@ class ItemsAdapter(
         var description: String = description
 
         override fun toString(): String {
-            return "${title}"
+            return title
         }
     }
 
     private fun resetAllPlayButtons(recyclerView: RecyclerView) {
         for (i in 0 until itemCount) {
-            val viewHolder = recyclerView.findViewHolderForAdapterPosition(i) as ItemsHolder
-            viewHolder.resetPlayButton()
+            val viewHolder = recyclerView.findViewHolderForAdapterPosition(i)
+            if (viewHolder is ItemsHolder) {
+                viewHolder.resetPlayButton()
+            }
         }
     }
 

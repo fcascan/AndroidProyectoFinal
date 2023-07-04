@@ -88,8 +88,8 @@ class DashboardFragment : Fragment() {
                     val file = File(directory, "${dashboardViewModel.filteredItemsList[index].documentId!!}.opus")
                     sharedViewModel.playFile(file) {
                         Log.d("$_TAG - onViewCreated", "Play Audio onCompletionListener index: $index")
-                        val viewHolder = recyclerView.findViewHolderForAdapterPosition(index) as ItemsAdapter.ItemsHolder
-                        viewHolder.resetPlayButton()
+                        val viewHolder = recyclerView.findViewHolderForAdapterPosition(index) as? ItemsAdapter.ItemsHolder
+                        viewHolder?.resetPlayButton()
                     }
                 },
                 onPauseClicked = { index -> sharedViewModel.pausePlayback() },

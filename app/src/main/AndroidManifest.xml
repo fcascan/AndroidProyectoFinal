@@ -22,10 +22,16 @@
         tools:targetApi="31">
         <activity
             android:name=".activities.FileReceiverActivity"
-            android:exported="false"
+            android:exported="true"
             android:grantUriPermissions="true"
             android:label="@string/title_activity_file_receiver"
             android:theme="@style/Theme.ProyectoFinal">
+            <!-- https://developer.android.com/guide/components/intents-filters?hl=es-419 -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activities.MainActivity"
@@ -39,12 +45,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- https://developer.android.com/guide/components/intents-filters?hl=es-419 -->
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="audio/*" />
-            </intent-filter>
+
         </activity>
 
         <!-- https://developer.android.com/training/secure-file-sharing/setup-sharing?hl=es-419 -->
