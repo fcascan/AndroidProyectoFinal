@@ -71,18 +71,19 @@ class FilesManager {
             Log.e("$_TAG - deleteFileFromInternalMemory", "File does not exist: ${fileName}.opus")
         }
     }
-
-    fun renameFile(file: File, newFile: File) {
-        Log.d("$_TAG - renameFile", "file: $file")
+    fun renameAndCopyFile(file: File, newFile: File) {
+        Log.d("$_TAG - renameAndCopyFile", "file: $file")
         if (!file.exists()) {
-            Log.e("$_TAG - renameFile", "File not found: ${file.name}")
+            Log.e("$_TAG - renameAndCopyFile", "File not found: ${file.name}")
             return
         }
         try {
             file.copyTo(newFile, true)
-            Log.d("$_TAG - renameFile", "File renamed and moved to: ${newFile.absoluteFile}")
+            Log.d("$_TAG - renameAndCopyFile", "File renamed and moved to: ${newFile.absoluteFile}")
         } catch (e: Exception) {
-            Log.e("$_TAG - renameFile", "Failed to rename file: ${file.name}, Exception: $e")
+            Log.e("$_TAG - renameAndCopyFile", "Failed to rename and copy file: ${file.name}, Exception: $e")
         }
     }
+
+
 }

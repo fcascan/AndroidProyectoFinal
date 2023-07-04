@@ -85,16 +85,48 @@ class SharedViewModel : ViewModel() {
         _screenState.value = screenState
     }
 
-    fun saveItemOnEverywhere(item: Item, rootDirectory: File, onComplete: (Result) -> Unit) = viewModelScope.launch {
-        Log.d("$_TAG - saveItemOnEverywhere", "Saving item on everywhere...")
+    fun saveReceivedItemOnEverywhere(item: Item, receivedFile: File, onComplete: (Result) -> Unit) = viewModelScope.launch {
+        Log.d("$_TAG - saveReceivedItemOnEverywhere", "Saving item on everywhere...")
         var documentID: String? = null
         //1) Save as new Item in Firebase and get the document ID
         _firestoreManager.addObjectToCollection(item, ITEMS_COLLECTION) { result, docID ->
             if (result == Result.FAILURE || docID == null) {
-                Log.e("$_TAG - saveItemOnEverywhere", "Error saving item in Firestore")
+                Log.e("$_TAG - saveReceivedItemOnEverywhere", "Error saving item in Firestore")
                 onComplete(result)
             } else {
-                Log.d("$_TAG - saveItemOnEverywhere", "Item saved successfully with documentID: $docID")
+                Log.d("$_TAG - saveReceivedItemOnEverywhere", "Item saved successfully with documentID: $docID")
+                documentID = docID
+            }
+        }
+
+        //2) Change audio file name with the documentID and move it to the audios folder
+        val newFile = File(receivedFile, "audios/$documentID.opus")
+        _filesManager.renameAndCopyFile(receivedFile, newFile)
+
+        //3) Then save the file in Storage with userID as Folder:
+        val storagePath = "${userID}/$documentID.opus"
+        _storageManager.uploadFile(newFile, storagePath) { result ->
+            if (result == Result.FAILURE) {
+                Log.e("$_TAG - saveReceivedItemOnEverywhere", "Error saving file in Storage")
+                onComplete(result)
+            } else {
+                Log.d("$_TAG - saveReceivedItemOnEverywhere", "File saved successfully in Storage")
+                onComplete(result)
+            }
+        }
+        //4) Refresh the lists and then NavigateUp
+    }
+
+    fun saveRecordedItemOnEverywhere(item: Item, rootDirectory: File, onComplete: (Result) -> Unit) = viewModelScope.launch {
+        Log.d("$_TAG - saveRecordedItemOnEverywhere", "Saving item on everywhere...")
+        var documentID: String? = null
+        //1) Save as new Item in Firebase and get the document ID
+        _firestoreManager.addObjectToCollection(item, ITEMS_COLLECTION) { result, docID ->
+            if (result == Result.FAILURE || docID == null) {
+                Log.e("$_TAG - saveRecordedItemOnEverywhere", "Error saving item in Firestore")
+                onComplete(result)
+            } else {
+                Log.d("$_TAG - saveRecordedItemOnEverywhere", "Item saved successfully with documentID: $docID")
                 documentID = docID
             }
         }
@@ -102,16 +134,16 @@ class SharedViewModel : ViewModel() {
         //2) Change audio file name with the documentID and move it to the audios folder
         val file = File(rootDirectory, "recordings/recorded_audio.aac")
         val newFile = File(rootDirectory, "audios/$documentID.aac")
-        _filesManager.renameFile(file, newFile)
+        _filesManager.renameAndCopyFile(file, newFile)
 
         //3) Then save the file in Storage with userID as Folder:
         val storagePath = "${userID}/$documentID.opus"
         _storageManager.uploadFile(newFile, storagePath) { result ->
             if (result == Result.FAILURE) {
-                Log.e("$_TAG - saveItemOnEverywhere", "Error saving file in Storage")
+                Log.e("$_TAG - saveRecordedItemOnEverywhere", "Error saving file in Storage")
                 onComplete(result)
             } else {
-                Log.d("$_TAG - saveItemOnEverywhere", "File saved successfully in Storage")
+                Log.d("$_TAG - saveRecordedItemOnEverywhere", "File saved successfully in Storage")
                 onComplete(result)
             }
         }

@@ -308,7 +308,9 @@ class ItemDetailFragment : Fragment() {
                         Log.d("$_TAG - onDeleteClicked", "Item deleted successfully from everywhere")
                         Snackbar.make(v, "Successfully erased", Snackbar.LENGTH_LONG).show()
                         sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
-                        findNavController().navigateUp()
+                        sharedViewModel.initiateApp(requireContext()) {
+                            findNavController().navigateUp()
+                        }
                     } else {
                         Log.d("$_TAG - onDeleteClicked", "Error deleting item")
                         Snackbar.make(v, "Error deleting", Snackbar.LENGTH_LONG).show()

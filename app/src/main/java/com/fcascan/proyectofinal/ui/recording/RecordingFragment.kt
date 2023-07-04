@@ -175,7 +175,7 @@ class RecordingFragment : Fragment() {
             groupId
         )
         Log.d("$_TAG - onSaveClicked", "Item to save: $itemToSave")
-        sharedViewModel.saveItemOnEverywhere(itemToSave, rootDirectory) { result ->
+        sharedViewModel.saveRecordedItemOnEverywhere(itemToSave, rootDirectory) { result ->
             if (result == Result.SUCCESS) {
                 Log.d("$_TAG - onSavedClicked", "Item saved successfully")
                 sharedViewModel.setProgressBarState(LoadingState.SUCCESS)

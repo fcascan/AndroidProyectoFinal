@@ -57,7 +57,7 @@ class FileReceiverActivity : AppCompatActivity() {
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
         fileReceiverViewModel = ViewModelProvider(this)[FileReceiverViewModel::class.java]
 
-        //Initiate the root directory:
+        //Initiate directories:
         rootDirectory = File(filesDir, "")
         audiosDirectory = File(rootDirectory, "audios")
         receivedDirectory = File(rootDirectory, "received")
@@ -94,7 +94,7 @@ class FileReceiverActivity : AppCompatActivity() {
                     R.layout.simple_spinner_item,
                     categories
                 ).also { adapter ->
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
                     binding.spinnerNewAudioCategories.adapter = adapter
                     binding.spinnerNewAudioCategories.setSelection(0)
                 }
@@ -130,13 +130,14 @@ class FileReceiverActivity : AppCompatActivity() {
             sharedViewModel.stopPlayback()
         }
         binding.btnNewFileSave.setOnClickListener {
-            onSaveClicked(rootDirectory)
+            onSaveClicked(receivedFile)
         }
     }
 
     override fun onStart() {
         super.onStart()
         binding.progressBarMainActivity.visibility = View.INVISIBLE
+        initiateApp()
         populateSpinners()
     }
 
@@ -152,12 +153,25 @@ class FileReceiverActivity : AppCompatActivity() {
         if (userIDsharedPref != null && storedDate != null &&
             LocalDate.now().minusDays(AUTH_DAYS_TO_EXPIRE_LOGIN).isBefore(LocalDate.parse(storedDate))) {
             Log.d("$_TAG - checkSession", "User is already logged in")
+            sharedViewModel.setUserID(userIDsharedPref.getString("userID", "")!!)
         } else {
             Log.d("$_TAG - checkSession", "User is not logged in")
             Snackbar.make(binding.root, "You must be logged in to use this app", Snackbar.LENGTH_SHORT).show()
             val intent = Intent(this, AuthActivity::class.java)
             startActivity(intent)
             finish()
+        }
+    }
+
+    private fun initiateApp() {
+        Log.d("$_TAG - initiateApp", "Initiating App")
+        sharedViewModel.initiateApp(this) {result ->
+            if(result == Result.SUCCESS)
+                sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
+            else {
+                Snackbar.make(binding.root, "FAILURE LOADING", Snackbar.LENGTH_LONG).show()
+                sharedViewModel.setProgressBarState(LoadingState.FAILURE)
+            }
         }
     }
 
@@ -224,17 +238,20 @@ class FileReceiverActivity : AppCompatActivity() {
         if (intent == null) setResult(Activity.RESULT_CANCELED, intent)
         val audioUri: Uri? = intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri
         if (audioUri != null) {
-            val file = audioUri.path?.let { File(it) }
-            Log.d("$_TAG - handleSharedAudio", "Received audio file: ${file?.absolutePath}")
-            if (file != null) {
-                filesManager.renameFile(file, receivedFile)
-                Log.d("$_TAG - handleSharedAudio", "Renamed received audio: ${file.absolutePath}")
+            val inputStream = this.contentResolver.openInputStream(audioUri)
+            if (inputStream != null) {
+                receivedFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                    Log.d("$_TAG - handleSharedAudio", "File renamed and moved to: ${receivedFile.absoluteFile}")
+                }
+            } else {
+                Log.e("$_TAG - renameAndCopyFile", "Failed to open input stream for file: ${audioUri.path}")
             }
         }
     }
 
-    private fun onSaveClicked(rootDirectory: File) {
-        Log.d("$_TAG - onSaveClicked", "Save Button Clicked")
+    private fun onSaveClicked(file: File) {
+        Log.d("$_TAG - onSaveClicked", "Save Button Clicked, file to save: $file")
         binding.progressBarMainActivity.visibility = View.VISIBLE
         disableViewElements()
         val selectedCategoryIndex = binding.spinnerNewAudioCategories.selectedItemPosition-1
@@ -250,7 +267,7 @@ class FileReceiverActivity : AppCompatActivity() {
             groupId
         )
         Log.d("$_TAG - onSaveClicked", "Item to save: $itemToSave")
-        sharedViewModel.saveItemOnEverywhere(itemToSave, rootDirectory) { result ->
+        sharedViewModel.saveReceivedItemOnEverywhere(itemToSave, file) { result ->
             if (result == Result.SUCCESS) {
                 Log.d("$_TAG - onSavedClicked", "Item saved successfully")
                 binding.progressBarMainActivity.visibility = View.INVISIBLE
