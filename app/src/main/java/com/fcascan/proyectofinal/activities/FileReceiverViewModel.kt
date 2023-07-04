@@ -5,9 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fcascan.proyectofinal.entities.Category
 import com.fcascan.proyectofinal.entities.Group
+import com.fcascan.proyectofinal.repositories.AuthManager
 
 class FileReceiverViewModel : ViewModel() {
     private val _TAG = "FCC#FileReceiverViewModel"
+
+    //Managers:
+    private val _authManager = AuthManager()
+
+    init {
+        //Initialize Firebase Auth:
+        _authManager.initializeAuth()
+    }
 
     //LiveData for the View:
     var spinnerCategoriesContent: MutableLiveData<MutableList<String>?> = MutableLiveData()

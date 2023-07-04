@@ -3,6 +3,7 @@ package com.fcascan.proyectofinal.activities
 import android.Manifest
 import android.R
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.fcascan.proyectofinal.constants.AUTH_DAYS_TO_EXPIRE_LOGIN
 import com.fcascan.proyectofinal.databinding.ActivityFileReceiverBinding
 import com.fcascan.proyectofinal.entities.Item
 import com.fcascan.proyectofinal.enums.LoadingState
@@ -22,6 +24,7 @@ import com.fcascan.proyectofinal.repositories.FilesManager
 import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
+import java.time.LocalDate
 
 class FileReceiverActivity : AppCompatActivity() {
     private val _TAG = "FCC#FileReceiverActivity"
@@ -60,9 +63,9 @@ class FileReceiverActivity : AppCompatActivity() {
         receivedDirectory = File(rootDirectory, "received")
         receivedFile = File(receivedDirectory, "receivedFile.opus")
 
-        //Hardcode User:
+        //Checksession:
+        checkSession()
         sharedViewModel.setUserID("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
-        //TODO() Set User: AUTH
 
         //Check Permissions:
         checkPermissions()
@@ -136,6 +139,26 @@ class FileReceiverActivity : AppCompatActivity() {
         super.onStart()
         binding.progressBarMainActivity.visibility = View.INVISIBLE
         populateSpinners()
+    }
+
+    private fun checkSession() {
+        Log.d("$_TAG - checkSession", "Checking if user is already logged in")
+        val userIDsharedPref = this.getSharedPreferences("userID", Context.MODE_PRIVATE)
+        val dateSharedPref = this.getSharedPreferences("date", Context.MODE_PRIVATE)
+        Log.d(_TAG, "userIDsharedPref: ${userIDsharedPref.getString("userID", "")}")
+        Log.d(_TAG, "dateSharedPref: ${dateSharedPref.getString("date", "")}")
+
+        val storedDate = dateSharedPref.getString("date", null)
+        if (userIDsharedPref != null && storedDate != null &&
+            LocalDate.now().minusDays(AUTH_DAYS_TO_EXPIRE_LOGIN).isBefore(LocalDate.parse(storedDate))) {
+            Log.d("$_TAG - checkSession", "User is already logged in")
+        } else {
+            Log.d("$_TAG - checkSession", "User is not logged in")
+            Snackbar.make(binding.root, "You must be logged in to use this app", Snackbar.LENGTH_SHORT).show()
+            val intent = Intent(this, AuthActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun populateSpinners() {
