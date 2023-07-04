@@ -128,12 +128,27 @@ class SharedViewModel : ViewModel() {
         Log.d("$_TAG - wipeItemFromEverywhere", "Wiping item from everywhere...")
         //        TODO()
         //1) Borrar el item de la base de datos
+        _firestoreManager.deleteObjectFromCollection(itemID, ITEMS_COLLECTION) { result ->
+            if (result == Result.FAILURE) {
+                Log.e("$_TAG - wipeItemFromEverywhere", "Error deleting item from Firestore")
+                onComplete(result)
+            } else Log.d("$_TAG - wipeItemFromEverywhere", "Item deleted successfully from Firestore")
+        }
+
         //2) Borrar el archivo de audio de la carpeta de la app
         _filesManager.deleteFileFromInternalMemory(itemID, context)
+
         //3) Borrar el archivo de audio de Storage
-        //4) Volver a la pantalla anterior
-//        findNavController().navigateUp()
-        onComplete(Result.SUCCESS)
+        _storageManager.deleteFileFromStorage("$userID/$itemID.opus") { result ->
+            if (result == Result.FAILURE) {
+                Log.e("$_TAG - wipeItemFromEverywhere", "Error deleting file from Storage")
+                onComplete(result)
+            } else {
+                //4) Volver a la pantalla anterior
+                Log.d("$_TAG - wipeItemFromEverywhere", "File deleted successfully from Storage")
+                onComplete(Result.SUCCESS)
+            }
+        }
     }
 
 

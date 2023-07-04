@@ -3,7 +3,6 @@ package com.fcascan.proyectofinal.repositories
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.core.net.toUri
 import com.fcascan.proyectofinal.constants.MAX_FILE_SIZE_BYTES
 import com.fcascan.proyectofinal.enums.Result
 import com.google.firebase.ktx.Firebase
@@ -61,25 +60,26 @@ class StorageManager {
         Log.d("$_TAG - downloadFile", "path: $path")
         val storageRef = _storage.reference
         val fileRef = storageRef.child(path)
-        fileRef.downloadUrl
-            .addOnSuccessListener {
-                callback(it.toString())
-            }
-            .addOnFailureListener {
-                callback(null)
-            }
+        try {
+            val downloadUrl = fileRef.downloadUrl.await()
+            callback(downloadUrl.toString())
+        } catch (e: Exception) {
+            Log.e("$_TAG - downloadFile", "Error downloading file: $e")
+            callback(null)
+        }
     }
 
-    suspend fun deleteFile(path: String, callback: (Boolean) -> Unit) {
-        Log.d("$_TAG - deleteFile", "path: $path")
+
+    suspend fun deleteFileFromStorage(pathToReference: String, callback: (Result) -> Unit) {
+        Log.d("$_TAG - deleteFile", "pathToReference: $pathToReference")
         val storageRef = _storage.reference
-        val fileRef = storageRef.child(path)
-        fileRef.delete()
-            .addOnSuccessListener {
-                callback(true)
-            }
-            .addOnFailureListener {
-                callback(false)
-            }
+        val fileRef = storageRef.child(pathToReference)
+        try {
+            fileRef.delete().await()
+            callback(Result.SUCCESS)
+        } catch (e: Exception) {
+            Log.e("$_TAG - deleteFile", "Error deleting file: $e")
+            callback(Result.FAILURE)
+        }
     }
 }

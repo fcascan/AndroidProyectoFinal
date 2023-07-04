@@ -8,7 +8,6 @@ import com.fcascan.proyectofinal.entities.Category
 import com.fcascan.proyectofinal.entities.Group
 import com.fcascan.proyectofinal.entities.Item
 import com.fcascan.proyectofinal.enums.Result
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -16,7 +15,7 @@ import kotlinx.coroutines.tasks.await
 class FirestoreManager {
     val _TAG = "FCC#FirestoreManager"
 
-    val _db = Firebase.firestore
+    val _firestore = Firebase.firestore
 
     //Coroutines:
     suspend fun getCollectionByUserID(userID: String, collection: String): MutableList<out Any>? {
@@ -28,7 +27,7 @@ class FirestoreManager {
                 GROUPS_COLLECTION -> Group::class.java
                 else -> throw Exception("Invalid collection name")
             }
-            val data = _db.collection(collection)
+            val data = _firestore.collection(collection)
                 .whereEqualTo("userID", userID)
                 .get()
                 .await()
@@ -51,13 +50,19 @@ class FirestoreManager {
                 GROUPS_COLLECTION -> Group::class.java
                 else -> throw Exception("Invalid collection name")
             }
-            val documentID = _db.collection(collection)
+            val documentID = _firestore.collection(collection)
                 .add(thing)
                 .await()
-            Log.d("$_TAG - addObjectToCollection", "Item added to FireStore with ID ${documentID.id}")
-            callback(Result.SUCCESS, documentID.id)
+            documentID?.let {
+                Log.d("$_TAG - addObjectToCollection", "Item added to Firestore with ID ${it.id}")
+                callback(Result.SUCCESS, it.id)
+            } ?: run {
+                Log.e("$_TAG - addObjectToCollection", "Document ID is null")
+                callback(Result.FAILURE, null)
+            }
         } catch (e: Exception) {
-            Log.d("$_TAG - addObjectToCollection", "Error Message: ${e.message}")
+            Log.e("$_TAG - addObjectToCollection", "Error adding document: ${e.message}")
+            callback(Result.FAILURE, null)
         }
     }
 
@@ -70,38 +75,37 @@ class FirestoreManager {
                 GROUPS_COLLECTION -> (thing as Group).documentId
                 else -> throw Exception("Invalid collection name")
             }
-            _db.collection(collection)
-                .document(documentId!!)
+            documentId?.let {_firestore.collection(collection)
+                .document(documentId)
                 .set(thing)
                 .await()
-            Log.d("$_TAG - updateObjectInCollection", "Item successfully updated in FireStore")
-            callback(Result.SUCCESS)
+                Log.d("$_TAG - updateObjectInCollection", "Item successfully updated in FireStore")
+                callback(Result.SUCCESS)
+            } ?: run {
+                Log.e("$_TAG - updateObjectInCollection", "Document ID is null")
+                callback(Result.FAILURE)
+            }
         } catch (e: Exception) {
             Log.d("$_TAG - updateObjectInCollection", "Error Message: ${e.message}")
             callback(Result.FAILURE)
         }
     }
 
-    suspend fun deleteObjectFromCollection(thing: DocumentSnapshot, collection: String, callback: (Boolean) -> Unit) {
-        Log.d("$_TAG - deleteObjectFromCollection", "thing: $thing - collection: $collection")
+    suspend fun deleteObjectFromCollection(documentId: String, collection: String, callback: (Result) -> Unit) {
+        Log.d("$_TAG - deleteObjectFromCollection", "documentId: $documentId - collection: $collection")
         try {
-            when (collection) {
-                ITEMS_COLLECTION -> Item::class.java
-                CATEGORIES_COLLECTION -> Category::class.java
-                GROUPS_COLLECTION -> Group::class.java
-                else -> throw Exception("Invalid collection name")
+            if (collection !in listOf(ITEMS_COLLECTION, CATEGORIES_COLLECTION, GROUPS_COLLECTION)) {
+                throw Exception("Invalid collection name")
             }
-            _db.collection(collection)
-                .document(thing.id)
-                .delete()
-                .addOnSuccessListener {
-                    Log.d("$_TAG - deleteObjectFromCollection", "DocumentSnapshot successfully deleted!")
-                    callback(true)
-                }
-                .addOnFailureListener { exception ->
-                    Log.d("$_TAG - deleteObjectFromCollection", "Error Message: ${exception.message}")
-                    callback(false)
-                }
+            try {
+                val documentReference = _firestore.collection(collection).document(documentId)
+                val deleteResult = documentReference.delete().await()
+                Log.d("$_TAG - deleteObjectFromCollection", "DocumentSnapshot successfully deleted!")
+                callback(Result.SUCCESS)
+            } catch (e: Exception) {
+                Log.e("$_TAG - deleteObjectFromCollection", "Error deleting document: ${e.message}")
+                callback(Result.FAILURE)
+            }
         } catch (e: Exception) {
             Log.d("$_TAG - deleteObjectFromCollection", "Error Message: ${e.message}")
         }
@@ -116,7 +120,7 @@ class FirestoreManager {
                 GROUPS_COLLECTION -> Group::class.java
                 else -> throw Exception("Invalid collection name")
             }
-            _db.collection(collection)
+            _firestore.collection(collection)
                 .document(id)
                 .get()
                 .addOnSuccessListener { document ->

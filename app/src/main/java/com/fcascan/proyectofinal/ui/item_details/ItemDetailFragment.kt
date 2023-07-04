@@ -303,13 +303,15 @@ class ItemDetailFragment : Fragment() {
             .setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
                 sharedViewModel.wipeItemFromEverywhere(itemId.toString(), requireContext()) { result ->
                     if (result == Result.SUCCESS) {
-                        Log.d("$_TAG - onDeleteClicked", "Item deleted")
-                        Snackbar.make(v, "Successfully erased", Snackbar.LENGTH_SHORT).show()
+                        Log.d("$_TAG - onDeleteClicked", "Item deleted successfully from everywhere")
+                        Snackbar.make(v, "Successfully erased", Snackbar.LENGTH_LONG).show()
                         sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
+                        findNavController().navigateUp()
                     } else {
                         Log.d("$_TAG - onDeleteClicked", "Error deleting item")
                         Snackbar.make(v, "Error deleting", Snackbar.LENGTH_LONG).show()
                         sharedViewModel.setProgressBarState(LoadingState.FAILURE)
+                        findNavController().navigateUp()
                     }
                 }
                 dialog.dismiss()

@@ -36,7 +36,7 @@ class FilesManager {
                 Log.d("$_TAG - checkFolders", "Folder already exists: ${receivedDirectory.absolutePath}")
             }
         } else {
-            Log.d("$_TAG - checkFolders", "RootDirectory not recognized: ${rootDirectory.absolutePath}")
+            Log.e("$_TAG - checkFolders", "RootDirectory not recognized: ${rootDirectory.absolutePath}")
         }
     }
 
@@ -61,21 +61,21 @@ class FilesManager {
         }
     }
 
-    suspend fun deleteFileFromInternalMemory(fileName: String, context: Context) {
+    fun deleteFileFromInternalMemory(fileName: String, context: Context) {
         Log.d("$_TAG - deleteFileFromInternalMemory", "fileName: $fileName")
         val file = File(context.filesDir, "${fileName}.opus")
         if (file.exists()) {
             file.delete()
             Log.d("$_TAG - deleteFileFromInternalMemory", "File deleted: ${fileName}.opus")
         } else {
-            Log.d("$_TAG - deleteFileFromInternalMemory", "File does not exist: ${fileName}.opus")
+            Log.e("$_TAG - deleteFileFromInternalMemory", "File does not exist: ${fileName}.opus")
         }
     }
 
     fun renameFile(file: File, newFile: File) {
         Log.d("$_TAG - renameFile", "file: $file")
         if (!file.exists()) {
-            Log.d("$_TAG - renameFile", "File not found: ${file.name}")
+            Log.e("$_TAG - renameFile", "File not found: ${file.name}")
             return
         }
         try {
