@@ -276,12 +276,14 @@ class ItemDetailFragment : Fragment() {
             sharedViewModel.getGroupIdByIndex(spinnerItemDetailGroup.selectedItemPosition-1)
         )
         Log.d("$_TAG - onSavedClicked", "Item to save: $itemToSave")
-        sharedViewModel.updateItem(itemToSave, requireContext()) { result ->
+        sharedViewModel.updateItem(itemToSave) { result ->
             if (result == Result.SUCCESS) {
                 Log.d("$_TAG - onSavedClicked", "Successfully saved")
                 Snackbar.make(v, "Successfully saved", Snackbar.LENGTH_SHORT).show()
                 sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
-    //        findNavController().navigateUp()
+                sharedViewModel.initiateApp(requireContext()) {
+                    findNavController().navigateUp()
+                }
             } else {
                 Log.d("$_TAG - onSavedClicked", "Error saving")
                 Snackbar.make(v, "Error saving", Snackbar.LENGTH_LONG).show()

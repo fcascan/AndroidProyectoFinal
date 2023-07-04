@@ -18,11 +18,11 @@ class AuthActivityViewModel : ViewModel() {
     private val _progressBar = MutableLiveData<LoadingState>()
     val progressBar: MutableLiveData<LoadingState> get() = _progressBar
 
-    private val _userID = MutableLiveData<String>()
-    val userID: MutableLiveData<String> get() = _userID
+    private val _logedIn = MutableLiveData<Boolean>()
+    val logedIn: MutableLiveData<Boolean> get() = _logedIn
 
-    private val _currentDate = MutableLiveData<String>()
-    val currentDate: MutableLiveData<String> get() = _currentDate
+    var userID: String = ""
+    var currentDate: String = ""
 
     //Managers:
     private val _authManager = AuthManager()
@@ -41,10 +41,11 @@ class AuthActivityViewModel : ViewModel() {
 
     fun onSignInClicked(email: String, password: String, onComplete: (Result) -> Unit) {
         Log.d("$_TAG - onSignInClicked", "email: $email")
-        _authManager.signInWithEmailAndPassword(email, password) { userID ->
-            if (userID.isNotEmpty()) {
-                setUserID(userID)
-                setCurrentDate(LocalDate.now())
+        _authManager.signInWithEmailAndPassword(email, password) { result ->
+            if (result.isNotEmpty()) {
+                userID = result
+                currentDate = LocalDate.now().toString()
+                setLogedIn(true)
                 onComplete(Result.SUCCESS)
             } else onComplete(Result.FAILURE)
         }
@@ -52,27 +53,17 @@ class AuthActivityViewModel : ViewModel() {
 
     fun onRegisterClicked(email: String, password: String, onComplete: (Result) -> Unit) {
         Log.d("$_TAG - onRegisterClicked", "email: $email")
-        _authManager.createUserWithEmailAndPassword(email, password) { userID ->
-            if (userID.isNotEmpty()) {
-                setUserID(userID)
-                setCurrentDate(LocalDate.now())
+        _authManager.createUserWithEmailAndPassword(email, password) { result ->
+            if (result.isNotEmpty()) {
+                userID = result
+                currentDate = LocalDate.now().toString()
                 onComplete(Result.SUCCESS)
             } else onComplete(Result.FAILURE)
         }
     }
 
-    fun setUserID(id: String) {
-        Log.d("$_TAG - setUserID", "Setting userID: $id")
-        _userID.postValue(id)
-    }
-
-    fun setCurrentDate(date: LocalDate) {
-        Log.d("$_TAG - setCurrentDate", "Setting currentDate: $date")
-        _currentDate.postValue(date.toString())
-    }
-
-    fun setCurrentDate(dateString: String) {
-        Log.d("$_TAG - setCurrentDate", "Setting currentDate: $dateString")
-        _currentDate.postValue(dateString)
+    fun setLogedIn(logedIn: Boolean) {
+        Log.d("$_TAG - setLogedIn", "Setting logedIn: $logedIn")
+        _logedIn.postValue(logedIn)
     }
 }

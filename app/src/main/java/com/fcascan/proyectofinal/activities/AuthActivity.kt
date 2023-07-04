@@ -39,43 +39,31 @@ class AuthActivity : AppCompatActivity() {
 
         authActivityViewModel.setProgressBarState(LoadingState.SUCCESS)
 
-        // Shared Preferences:
-        val userIDsharedPref = this.getSharedPreferences("userID", Context.MODE_PRIVATE)
-        val dateSharedPref = this.getSharedPreferences("date", Context.MODE_PRIVATE)
-        Log.d(_TAG, "userIDsharedPref: ${userIDsharedPref.getString("userID", "")}")
-        Log.d(_TAG, "dateSharedPref: ${dateSharedPref.getString("date", "")}")
+        //Checksession:
+        checkSession()
 
-        // Check if user is already logged in:
-        val storedDate = dateSharedPref.getString("date", null)
-        if (userIDsharedPref != null && storedDate != null &&
-            LocalDate.now().minusDays(AUTH_DAYS_TO_EXPIRE_LOGIN).isBefore(LocalDate.parse(storedDate))) {
-            val intent = Intent(this, MainActivity::class.java).apply {
-                putExtra("userID", userIDsharedPref.getString("userID", ""))
-            }
-            startActivity(intent)
-        }
-
-
-        //Login or Register observers:
-        authActivityViewModel.userID.observe(this) { userID ->
-            Log.d(_TAG, "userID changed: $userID")
-            if (userID != null) {
-                //Save userID in Shared Preferences:
-                val editor = userIDsharedPref.edit()
-                editor.putString("userID", userID)
-                editor.apply()
-                redirect()
-            }
-        }
-
-        authActivityViewModel.currentDate.observe(this) { date ->
-            Log.d(_TAG, "currentDate changed: $date")
-            if (date != null) {
-                //Save date in Shared Preferences:
-                val editorDate = dateSharedPref.edit()
-                editorDate.putString("date", date)
-                editorDate.apply()
-                redirect()
+        //Login observer:
+        authActivityViewModel.logedIn.observe(this) { logedIn ->
+            Log.d("$_TAG - onCreate", "logedIn changed: $logedIn")
+            if (logedIn != null) {
+                if (logedIn) {
+                    //Save Shared Preferences:
+                    val userIDsharedPref = this.getSharedPreferences("userID", Context.MODE_PRIVATE)
+                    val editor = userIDsharedPref.edit()
+                    editor.putString("userID", authActivityViewModel.userID)
+                    editor.apply()
+                    val dateSharedPref = this.getSharedPreferences("date", Context.MODE_PRIVATE)
+                    val editorDate = dateSharedPref.edit()
+                    editorDate.putString("date", authActivityViewModel.currentDate)
+                    editorDate.apply()
+                    //Go to MainActivity:
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Log.d("$_TAG - onCreate", "Login Failed, logedIn: $logedIn")
+                    Snackbar.make(binding.root, "Login Failed", Snackbar.LENGTH_LONG).show()
+                }
             }
         }
 
@@ -160,10 +148,31 @@ class AuthActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun redirect() {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            putExtra("userID", authActivityViewModel.userID.value)
+    private fun checkSession() {
+        Log.d("$_TAG - checkSession", "Checking if user is already logged in")
+        val userIDsharedPref = this.getSharedPreferences("userID", Context.MODE_PRIVATE)
+        val dateSharedPref = this.getSharedPreferences("date", Context.MODE_PRIVATE)
+        Log.d("$_TAG - checkSession", "userIDsharedPref: ${userIDsharedPref.getString("userID", "")}")
+        Log.d("$_TAG - checkSession", "dateSharedPref: ${dateSharedPref.getString("date", "")}")
+
+        //Check if user is already logged in:
+        val storedDate = dateSharedPref.getString("date", null)
+        if (userIDsharedPref != null && storedDate != null &&
+            LocalDate.now().minusDays(AUTH_DAYS_TO_EXPIRE_LOGIN).isBefore(LocalDate.parse(storedDate))) {
+            Log.d("$_TAG - checkSession", "User is already logged in")
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtra("userID", userIDsharedPref.getString("userID", ""))
+            }
+            sharedViewModel.setUserID(userIDsharedPref.getString("userID", "")!!)
+            startActivity(intent)
+        } else {
+            Log.d("$_TAG - checkSession", "User is not logged in")
         }
+    }
+
+    private fun redirect() {
+        val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+        finish()
     }
 }

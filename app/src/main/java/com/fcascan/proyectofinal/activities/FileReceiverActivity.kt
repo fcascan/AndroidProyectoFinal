@@ -65,7 +65,6 @@ class FileReceiverActivity : AppCompatActivity() {
 
         //Checksession:
         checkSession()
-        sharedViewModel.setUserID("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
 
         //Check Permissions:
         checkPermissions()
@@ -148,6 +147,7 @@ class FileReceiverActivity : AppCompatActivity() {
         Log.d(_TAG, "userIDsharedPref: ${userIDsharedPref.getString("userID", "")}")
         Log.d(_TAG, "dateSharedPref: ${dateSharedPref.getString("date", "")}")
 
+        //Check if user is already logged in:
         val storedDate = dateSharedPref.getString("date", null)
         if (userIDsharedPref != null && storedDate != null &&
             LocalDate.now().minusDays(AUTH_DAYS_TO_EXPIRE_LOGIN).isBefore(LocalDate.parse(storedDate))) {

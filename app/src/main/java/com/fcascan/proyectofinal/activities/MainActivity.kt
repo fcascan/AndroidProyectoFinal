@@ -2,6 +2,7 @@ package com.fcascan.proyectofinal.activities
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -19,10 +20,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.fcascan.proyectofinal.enums.LoadingState
 import com.fcascan.proyectofinal.R
+import com.fcascan.proyectofinal.constants.AUTH_DAYS_TO_EXPIRE_LOGIN
 import com.fcascan.proyectofinal.databinding.ActivityMainBinding
 import com.fcascan.proyectofinal.enums.Result
 import com.fcascan.proyectofinal.shared.SharedViewModel
 import com.google.android.material.snackbar.Snackbar
+import java.time.LocalDate
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -52,9 +55,10 @@ class MainActivity : AppCompatActivity() {
         mainActivityViewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
 
-        //Hardcode User:
-        sharedViewModel.setUserID("KaRFGsvVFwNKd8CUAb6wHSrbEdy2")
-        //TODO() Set User: AUTH
+        //Set userID:
+        val userIDsharedPref = this.getSharedPreferences("userID", Context.MODE_PRIVATE)
+        Log.d(_TAG, "userIDsharedPref: ${userIDsharedPref.getString("userID", "")}")
+        sharedViewModel.setUserID(userIDsharedPref.getString("userID", "")!!)
 
         //Checkpermissions:
         checkPermissions()

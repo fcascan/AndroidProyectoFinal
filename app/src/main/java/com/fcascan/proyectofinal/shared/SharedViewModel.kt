@@ -118,7 +118,7 @@ class SharedViewModel : ViewModel() {
         //4) Refresh the lists and then NavigateUp
     }
 
-    fun updateItem(item: Item, context: Context, onComplete: (Result) -> Unit) = viewModelScope.launch {
+    fun updateItem(item: Item, onComplete: (Result) -> Unit) = viewModelScope.launch {
         _firestoreManager.updateObjectInCollection(item, ITEMS_COLLECTION) { result ->
             onComplete(result)
         }
