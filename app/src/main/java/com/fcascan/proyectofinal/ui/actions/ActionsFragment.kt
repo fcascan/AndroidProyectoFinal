@@ -5,8 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -14,45 +12,39 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.fcascan.proyectofinal.R
 import com.fcascan.proyectofinal.adapters.ActionsAdapter
+import com.fcascan.proyectofinal.databinding.FragmentActionsBinding
 import com.fcascan.proyectofinal.enums.ActionsScreen
 import com.fcascan.proyectofinal.shared.SharedViewModel
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ActionsFragment : Fragment() {
     private val _TAG = "FCC#ActionsFragment"
 
     //View Elements:
-    private lateinit var v : View
-    private lateinit var btnBack : Button
-    private lateinit var txtActionsScreenTitle : TextView
-    private lateinit var fabActions: FloatingActionButton
-    private lateinit var recyclerView: RecyclerView
+    private var _binding: FragmentActionsBinding? = null
+    private val binding get() = _binding!!
     private lateinit var recViewAdapter: ActionsAdapter
 
     //ViewModels:
     private lateinit var actionsViewModel: ActionsViewModel
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        //ViewModels:
         actionsViewModel = ViewModelProvider(this)[ActionsViewModel::class.java]
 
-        v = inflater.inflate(R.layout.fragment_actions, container, false)
-        btnBack = v.findViewById(R.id.btnBack)
-        txtActionsScreenTitle = v.findViewById(R.id.txtActionsScreenTitle)
-        fabActions = v.findViewById(R.id.fabActions)
-        recyclerView = v.findViewById(R.id.recViewActions)
+        //Inflate:
+        _binding = FragmentActionsBinding.inflate(inflater, container, false)
 
         //RecyclerView Config:
-        recyclerView.setHasFixedSize(true)
+        binding.recViewActions.setHasFixedSize(true)
 
-        return v
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,8 +67,8 @@ class ActionsFragment : Fragment() {
                 onClick = { index -> onCardClicked(index) },
                 onLongClick = { index -> onCardLongClicked(index) }
             )
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.adapter = recViewAdapter
+            binding.recViewActions.layoutManager = LinearLayoutManager(context)
+            binding.recViewActions.adapter = recViewAdapter
         }
 
         actionsViewModel.currentScreen.observe(viewLifecycleOwner) { screen ->
@@ -84,22 +76,22 @@ class ActionsFragment : Fragment() {
             actionsViewModel.changeRecViewContent()
             when(screen) {
                 ActionsScreen.SCREEN_ACTIONS -> {
-                    txtActionsScreenTitle.text = ActionsScreen.SCREEN_ACTIONS.title
-                    fabActions.visibility = View.GONE
-                    btnBack.visibility = View.GONE
-                    recyclerView.layoutManager = LinearLayoutManager(context)
+                    binding.txtActionsScreenTitle.text = ActionsScreen.SCREEN_ACTIONS.title
+                    binding.fabActions.visibility = View.GONE
+                    binding.btnBack.visibility = View.GONE
+                    binding.recViewActions.layoutManager = LinearLayoutManager(context)
                 }
                 ActionsScreen.SCREEN_CATEGORIES -> {
-                    txtActionsScreenTitle.text = ActionsScreen.SCREEN_CATEGORIES.title
-                    fabActions.visibility = View.VISIBLE
-                    btnBack.visibility = View.VISIBLE
-                    recyclerView.layoutManager = GridLayoutManager(context, 2)
+                    binding.txtActionsScreenTitle.text = ActionsScreen.SCREEN_CATEGORIES.title
+                    binding.fabActions.visibility = View.VISIBLE
+                    binding.btnBack.visibility = View.VISIBLE
+                    binding.recViewActions.layoutManager = GridLayoutManager(context, 2)
                 }
                 ActionsScreen.SCREEN_GROUPS -> {
-                    txtActionsScreenTitle.text = ActionsScreen.SCREEN_GROUPS.title
-                    fabActions.visibility = View.VISIBLE
-                    btnBack.visibility = View.VISIBLE
-                    recyclerView.layoutManager = GridLayoutManager(context, 2)
+                    binding.txtActionsScreenTitle.text = ActionsScreen.SCREEN_GROUPS.title
+                    binding.fabActions.visibility = View.VISIBLE
+                    binding.btnBack.visibility = View.VISIBLE
+                    binding.recViewActions.layoutManager = GridLayoutManager(context, 2)
                 }
                 else -> {
                     Log.e("$_TAG - onViewCreated", "Error: CurrentScreen not detected")
@@ -108,8 +100,7 @@ class ActionsFragment : Fragment() {
             }
         }
 
-
-        fabActions.setOnClickListener {
+        binding.fabActions.setOnClickListener {
             Log.d("$_TAG - onViewCreated", "FAB clicked")
             when(actionsViewModel.currentScreen.value) {
                 ActionsScreen.SCREEN_ACTIONS -> { /*TODO()*/ }
@@ -122,7 +113,7 @@ class ActionsFragment : Fragment() {
             }
         }
 
-        btnBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             Log.d("$_TAG - onViewCreated", "Back button clicked")
             onBackPressed()
         }
@@ -148,6 +139,7 @@ class ActionsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        _binding = null
     }
 
     //Navigations:

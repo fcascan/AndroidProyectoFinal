@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.fcascan.proyectofinal.R
+import com.fcascan.proyectofinal.databinding.FragmentItemDetailBinding
 import com.fcascan.proyectofinal.entities.Item
 import com.fcascan.proyectofinal.enums.LoadingState
 import com.fcascan.proyectofinal.enums.PlaybackState
@@ -33,20 +34,8 @@ class ItemDetailFragment : Fragment() {
     private var itemId : String? = null
 
     //View Elements:
-    private lateinit var v : View
-    private lateinit var btnBack : Button
-    private lateinit var txtItemDetailScreenTitle: TextView
-    private lateinit var txtItemDetailTitle: EditText
-    private lateinit var txtItemDetailDescription: EditText
-    private lateinit var spinnerItemDetailCategories: Spinner
-    private lateinit var spinnerItemDetailGroup: Spinner
-    private lateinit var txtFileName: EditText
-    private lateinit var btnCardPlay: Button
-    private lateinit var btnCardPause: Button
-    private lateinit var btnCardStop: Button
-    private lateinit var btnSave: Button
-    private lateinit var btnClear: Button
-    private lateinit var btnDelete: Button
+    private var _binding : FragmentItemDetailBinding? = null
+    private val binding get() = _binding!!
 
     //ViewModels:
     private lateinit var itemDetailViewModel: ItemDetailViewModel
@@ -62,27 +51,16 @@ class ItemDetailFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         //ViewModels:
         itemDetailViewModel = ViewModelProvider(this)[ItemDetailViewModel::class.java]
 
-        v = inflater.inflate(R.layout.fragment_item_detail, container, false)
-        btnBack = v.findViewById(R.id.btnBack)
-        txtItemDetailScreenTitle = v.findViewById(R.id.txtActionsScreenTitle)
-        txtItemDetailTitle = v.findViewById(R.id.txtItemDetailTitle)
-        txtItemDetailDescription = v.findViewById(R.id.txtItemDetailDescription)
-        spinnerItemDetailCategories = v.findViewById(R.id.spinnerItemDetailCategories)
-        spinnerItemDetailGroup = v.findViewById(R.id.spinnerItemDetailGroup)
-        txtFileName = v.findViewById(R.id.txtFileName)
-        btnCardPlay = v.findViewById(R.id.btnCardPlay)
-        btnCardPause = v.findViewById(R.id.btnCardPause)
-        btnCardStop = v.findViewById(R.id.btnCardStop)
-        btnSave = v.findViewById(R.id.btnRecordingSave)
-        btnClear = v.findViewById(R.id.btnClear)
-        btnDelete = v.findViewById(R.id.btnDelete)
-        return v
+        //Inflate:
+        _binding = FragmentItemDetailBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -100,11 +78,11 @@ class ItemDetailFragment : Fragment() {
                     categories
                 ).also { adapter ->
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    spinnerItemDetailCategories.adapter = adapter
+                    binding.spinnerItemDetailCategories.adapter = adapter
                     val category = itemId?.let { sharedViewModel.getItemById(it)?.categoryID }
                     val categoryName = category?.let { sharedViewModel.getCategoryById(it)?.name }
                     if (categoryName != null) {
-                        setSpinnerSelection(spinnerItemDetailCategories, categoryName)
+                        setSpinnerSelection(binding.spinnerItemDetailCategories, categoryName)
                     }
                 }
             }
@@ -120,11 +98,11 @@ class ItemDetailFragment : Fragment() {
                     groups
                 ).also { adapter ->
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    spinnerItemDetailGroup.adapter = adapter
+                    binding.spinnerItemDetailGroup.adapter = adapter
                     val group = itemId?.let { sharedViewModel.getItemById(it)?.groupID }
                     val groupName = group?.let { sharedViewModel.getGroupById(it)?.name }
                     if (groupName != null) {
-                        setSpinnerSelection(spinnerItemDetailGroup, groupName)
+                        setSpinnerSelection(binding.spinnerItemDetailGroup, groupName)
                     }
                 }
             }
@@ -136,32 +114,32 @@ class ItemDetailFragment : Fragment() {
         }
 
         //Button Listeners:
-        btnBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             findNavController().navigateUp()
         }
-        btnCardPlay.setOnClickListener {
+        binding.btnCardPlay.setOnClickListener {
             playbackStarted()
-            val file = File(directory, "${txtFileName.text.toString()}.opus")
+            val file = File(directory, "${binding.txtFileName.text.toString()}.opus")
             sharedViewModel.playFile(file) {
                 Log.d("$_TAG - onViewCreated", "Playback finished")
                 playbackStopped()
             }
         }
-        btnCardPause.setOnClickListener {
+        binding.btnCardPause.setOnClickListener {
             playbackPaused()
             sharedViewModel.pausePlayback()
         }
-        btnCardStop.setOnClickListener {
+        binding.btnCardStop.setOnClickListener {
             playbackStopped()
             sharedViewModel.stopPlayback()
         }
-        btnSave.setOnClickListener {
+        binding.btnSave.setOnClickListener {
             onSavedClicked()
         }
-        btnClear.setOnClickListener {
+        binding.btnClear.setOnClickListener {
             onClearClicked()
         }
-        btnDelete.setOnClickListener {
+        binding.btnDelete.setOnClickListener {
             onDeleteClicked()
         }
     }
@@ -174,6 +152,11 @@ class ItemDetailFragment : Fragment() {
         editPermissionsCheck()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun changeButtonsStateWithPlayback(playbackState: PlaybackState?) {
         Log.d("$_TAG - changeButtonsStateWithPlayback", "playbackState: $playbackState")
         when (playbackState) {
@@ -183,7 +166,7 @@ class ItemDetailFragment : Fragment() {
             else -> {
                 Log.d("$_TAG - onViewCreated", "PlaybackState: $playbackState")
                 playbackStopped()
-                Snackbar.make(v, "PlaybackState: $playbackState", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, "PlaybackState: $playbackState", Snackbar.LENGTH_LONG).show()
             }
         }
     }
@@ -204,11 +187,11 @@ class ItemDetailFragment : Fragment() {
         //Primero buscar en la lista el item con el id
         val item = itemId?.let { sharedViewModel.getItemById(it) }
         if (item != null) {
-            txtItemDetailTitle.setText(item.title)
-            txtItemDetailDescription.setText(item.description)
-            spinnerItemDetailCategories.setSelection(sharedViewModel.getCategoryIndexByID(item.categoryID))
-            spinnerItemDetailGroup.setSelection(sharedViewModel.getGroupIndexByID(item.groupID))
-            txtFileName.setText(item.documentId)
+            binding.txtItemDetailTitle.setText(item.title)
+            binding.txtItemDetailDescription.setText(item.description)
+            binding.spinnerItemDetailCategories.setSelection(sharedViewModel.getCategoryIndexByID(item.categoryID))
+            binding.spinnerItemDetailGroup.setSelection(sharedViewModel.getGroupIndexByID(item.groupID))
+            binding.txtFileName.setText(item.documentId)
         } else {
             Log.d("$_TAG - populateFields", "Item not found")
             clearFields()
@@ -229,33 +212,33 @@ class ItemDetailFragment : Fragment() {
     private fun editPermissionsCheck() {
         Log.d("$_TAG - editPermissionsCheck", "Edit Permissions Check: $editPermissions")
         if(editPermissions != true) {
-            txtItemDetailScreenTitle.text = "Item Details (read-only)"
-            txtItemDetailTitle.focusable = View.NOT_FOCUSABLE
-            txtItemDetailDescription.focusable = View.NOT_FOCUSABLE
-            spinnerItemDetailCategories.isEnabled = false
-            spinnerItemDetailGroup.isEnabled = false
-            btnSave.visibility = View.GONE
-            btnClear.visibility = View.GONE
-            btnDelete.visibility = View.GONE
+            binding.txtScreenTitle.text = "Item Details (read-only)"
+            binding.txtItemDetailTitle.focusable = View.NOT_FOCUSABLE
+            binding.txtItemDetailDescription.focusable = View.NOT_FOCUSABLE
+            binding.spinnerItemDetailCategories.isEnabled = false
+            binding.spinnerItemDetailGroup.isEnabled = false
+            binding.btnSave.visibility = View.GONE
+            binding.btnClear.visibility = View.GONE
+            binding.btnDelete.visibility = View.GONE
         }
     }
 
     fun playbackStarted() {
-        btnCardPlay.visibility = View.INVISIBLE
-        btnCardPause.visibility = View.VISIBLE
-        btnCardStop.visibility = View.VISIBLE
+        binding.btnCardPlay.visibility = View.INVISIBLE
+        binding.btnCardPause.visibility = View.VISIBLE
+        binding.btnCardStop.visibility = View.VISIBLE
     }
 
     fun playbackPaused() {
-        btnCardPlay.visibility = View.VISIBLE
-        btnCardPause.visibility = View.INVISIBLE
-        btnCardStop.visibility = View.VISIBLE
+        binding.btnCardPlay.visibility = View.VISIBLE
+        binding.btnCardPause.visibility = View.INVISIBLE
+        binding.btnCardStop.visibility = View.VISIBLE
     }
 
     fun playbackStopped() {
-        btnCardPlay.visibility = View.VISIBLE
-        btnCardPause.visibility = View.INVISIBLE
-        btnCardStop.visibility = View.INVISIBLE
+        binding.btnCardPlay.visibility = View.VISIBLE
+        binding.btnCardPause.visibility = View.INVISIBLE
+        binding.btnCardStop.visibility = View.INVISIBLE
     }
 
     fun onSelectFileClicked() {
@@ -270,23 +253,23 @@ class ItemDetailFragment : Fragment() {
         val itemToSave = Item(
             itemId.toString(),
             sharedViewModel.userID,
-            txtItemDetailTitle.text.toString(),
-            txtItemDetailDescription.text.toString(),
-            sharedViewModel.getCategoryIdByIndex(spinnerItemDetailCategories.selectedItemPosition-1),
-            sharedViewModel.getGroupIdByIndex(spinnerItemDetailGroup.selectedItemPosition-1)
+            binding.txtItemDetailTitle.text.toString(),
+            binding.txtItemDetailDescription.text.toString(),
+            sharedViewModel.getCategoryIdByIndex(binding.spinnerItemDetailCategories.selectedItemPosition-1),
+            sharedViewModel.getGroupIdByIndex(binding.spinnerItemDetailGroup.selectedItemPosition-1)
         )
         Log.d("$_TAG - onSavedClicked", "Item to save: $itemToSave")
         sharedViewModel.updateItem(itemToSave) { result ->
             if (result == Result.SUCCESS) {
                 Log.d("$_TAG - onSavedClicked", "Successfully saved")
-                Snackbar.make(v, "Successfully saved", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "Successfully saved", Snackbar.LENGTH_SHORT).show()
                 sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
                 sharedViewModel.initiateApp(requireContext()) {
                     findNavController().navigateUp()
                 }
             } else {
                 Log.d("$_TAG - onSavedClicked", "Error saving")
-                Snackbar.make(v, "Error saving", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, "Error saving", Snackbar.LENGTH_LONG).show()
                 sharedViewModel.setProgressBarState(LoadingState.FAILURE)
             }
         }
@@ -306,14 +289,14 @@ class ItemDetailFragment : Fragment() {
                 sharedViewModel.wipeItemFromEverywhere(itemId.toString(), requireContext()) { result ->
                     if (result == Result.SUCCESS) {
                         Log.d("$_TAG - onDeleteClicked", "Item deleted successfully from everywhere")
-                        Snackbar.make(v, "Successfully erased", Snackbar.LENGTH_LONG).show()
+                        Snackbar.make(binding.root, "Successfully erased", Snackbar.LENGTH_LONG).show()
                         sharedViewModel.setProgressBarState(LoadingState.SUCCESS)
                         sharedViewModel.initiateApp(requireContext()) {
                             findNavController().navigateUp()
                         }
                     } else {
                         Log.d("$_TAG - onDeleteClicked", "Error deleting item")
-                        Snackbar.make(v, "Error deleting", Snackbar.LENGTH_LONG).show()
+                        Snackbar.make(binding.root, "Error deleting", Snackbar.LENGTH_LONG).show()
                         sharedViewModel.setProgressBarState(LoadingState.FAILURE)
                         findNavController().navigateUp()
                     }
@@ -329,11 +312,10 @@ class ItemDetailFragment : Fragment() {
     }
 
     private fun clearFields() {
-        txtItemDetailTitle.text.clear()
-        txtItemDetailDescription.text.clear()
-        spinnerItemDetailCategories.setSelection(0)
-        spinnerItemDetailGroup.setSelection(0)
-        Snackbar.make(v, "Fields Cleared", Snackbar.LENGTH_SHORT).show()
+        binding.txtItemDetailTitle.text.clear()
+        binding.txtItemDetailDescription.text.clear()
+        binding.spinnerItemDetailCategories.setSelection(0)
+        binding.spinnerItemDetailGroup.setSelection(0)
+        Snackbar.make(binding.root, "Fields Cleared", Snackbar.LENGTH_SHORT).show()
     }
-
 }

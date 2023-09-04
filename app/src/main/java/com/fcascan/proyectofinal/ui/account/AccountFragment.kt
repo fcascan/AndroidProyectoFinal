@@ -27,11 +27,13 @@ class AccountFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        //ViewModels:
         accountViewModel = ViewModelProvider(this)[AccountViewModel::class.java]
 
+        //Inflate:
         _binding = FragmentAccountBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-        return root
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
