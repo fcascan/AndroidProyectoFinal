@@ -5,6 +5,7 @@
     android:id="@+id/AccountLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
     tools:context=".ui.account.AccountFragment">
 
     <TextView
@@ -13,8 +14,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="Account"
-        android:textColor="@color/design_default_color_primary"
+        android:textColor="?attr/colorPrimaryVariant"
         android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

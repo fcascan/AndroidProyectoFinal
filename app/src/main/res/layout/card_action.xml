@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
-    android:backgroundTint="@color/design_default_color_primary"
+    android:backgroundTint="?attr/colorPrimaryVariant"
     app:cardCornerRadius="24dp">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/Constraint_Layout"
@@ -21,7 +21,7 @@
             android:layout_marginEnd="8dp"
             android:gravity="center_horizontal"
             android:text="Title Action"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +38,7 @@
             android:layout_marginBottom="24dp"
             android:gravity="center_horizontal"
             android:text="Action Description"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="18sp"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"

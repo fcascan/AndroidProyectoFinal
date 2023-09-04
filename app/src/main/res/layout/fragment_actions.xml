@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
     tools:context=".ui.actions.ActionsFragment">
 
     <Button
@@ -15,10 +16,10 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:elevation="0dp"
-        android:paddingLeft="8dp"
-        android:iconTint="@color/design_default_color_primary"
+        android:paddingStart="8dp"
+        android:iconTint="?attr/colorPrimaryVariant"
         app:icon="@drawable/ic_action_back"
-        app:iconSize="30dp"
+        app:iconSize="32dp"
         app:layout_constraintBottom_toTopOf="@+id/recViewActions"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,7 +30,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:text="Actions"
-        android:textColor="@color/design_default_color_primary"
+        android:iconTint="?attr/colorPrimaryVariant"
+        android:textStyle="bold"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@+id/btnBack"
         app:layout_constraintStart_toEndOf="@+id/btnBack"
@@ -55,5 +57,5 @@
         app:backgroundTint="@android:color/holo_green_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/white" />
+        app:tint="@android:color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>

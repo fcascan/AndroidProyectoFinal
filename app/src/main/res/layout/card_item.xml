@@ -6,39 +6,43 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
-    android:backgroundTint="@color/design_default_color_primary"
+    android:backgroundTint="?attr/colorPrimaryVariant"
     app:cardCornerRadius="24dp">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/Constraint_Layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/txtItemCardTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
             android:gravity="center_horizontal"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:text="Title"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/txtItemCardDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
             android:gravity="center_horizontal"
-            android:textColor="@color/design_default_color_on_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:text="Description"
             android:textSize="18sp"
             app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtItemCardTitle" />
         <Button
             android:id="@+id/btnItemCardPlay"
@@ -48,7 +52,9 @@
             android:layout_marginBottom="24dp"
             android:layout_marginStart="8dp"
             android:backgroundTint="@android:color/holo_green_light"
+            android:paddingStart="12dp"
             app:icon="@drawable/ic_action_play"
+            app:iconTint="@android:color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnItemCardStop"
             app:layout_constraintTop_toBottomOf="@+id/txtItemCardDescription"
@@ -59,46 +65,43 @@
             android:layout_width="48dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="@android:color/holo_green_light"
-            android:paddingLeft="12dp"
+            android:paddingStart="12dp"
             app:icon="@drawable/ic_action_pause"
+            app:iconTint="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnItemCardStop"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtItemCardDescription" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/btnItemCardStop"
             android:layout_width="48dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="@android:color/holo_red_light"
-            android:paddingLeft="12dp"
+            android:paddingStart="12dp"
             app:icon="@drawable/ic_action_stop"
             app:iconPadding="0dp"
+            app:iconTint="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtItemCardDescription" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/btnItemCardShare"
             android:layout_width="48dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="@android:color/holo_orange_light"
             android:drawablePadding="0dp"
             android:gravity="center"
-            android:paddingLeft="12dp"
+            android:paddingStart="12dp"
             app:icon="@drawable/ic_action_share"
+            app:iconTint="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnItemCardStop"
-            app:layout_constraintTop_toBottomOf="@+id/txtItemCardDescription" />
+            app:layout_constraintStart_toEndOf="@id/btnItemCardStop" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
