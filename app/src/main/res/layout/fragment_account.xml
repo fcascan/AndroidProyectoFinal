@@ -42,5 +42,31 @@
         app:layout_constraintTop_toBottomOf="@+id/txtScreenTitle"
         tools:src="@tools:sample/avatars" />
 
+    <Button
+        android:id="@+id/btnWipeLocalData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="48dp"
+        android:backgroundTint="@android:color/background_dark"
+        android:text="Wipe Local Data"
+        app:icon="@drawable/ic_action_wipe"
+        app:layout_constraintEnd_toEndOf="@+id/btnLogOut"
+        app:layout_constraintStart_toStartOf="@+id/btnLogOut"
+        app:layout_constraintTop_toBottomOf="@+id/btnLogOut" />
+
+    <Button
+        android:id="@+id/btnDeleteAccount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@android:color/background_dark"
+        android:text="Delete Account"
+        app:icon="@drawable/ic_action_forever_delete"
+        app:layout_constraintEnd_toEndOf="@+id/btnWipeLocalData"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btnWipeLocalData"
+        app:layout_constraintTop_toBottomOf="@+id/btnWipeLocalData" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

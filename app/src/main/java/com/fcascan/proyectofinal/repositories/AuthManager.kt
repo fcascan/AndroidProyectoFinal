@@ -1,6 +1,7 @@
 package com.fcascan.proyectofinal.repositories
 
 import android.util.Log
+import com.fcascan.proyectofinal.enums.Result
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -60,5 +61,18 @@ class AuthManager {
 
     fun signOut() {
         auth.signOut()
+    }
+
+    fun deleteAccount(onComplete: (Result) -> Unit) {
+        auth.currentUser?.delete()
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("$_TAG - deleteAccount", "User account deleted.")
+                    onComplete(Result.SUCCESS)
+                } else {
+                    Log.d("$_TAG - deleteAccount", "User account deletion failed.")
+                    onComplete(Result.FAILURE)
+                }
+            }
     }
 }

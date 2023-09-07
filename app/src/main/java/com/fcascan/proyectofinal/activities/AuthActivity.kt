@@ -39,7 +39,7 @@ class AuthActivity : AppCompatActivity() {
 
         authActivityViewModel.setProgressBarState(LoadingState.SUCCESS)
 
-        //Checksession:
+        //Check-session:
         checkSession()
 
         //Login observer:
@@ -71,12 +71,8 @@ class AuthActivity : AppCompatActivity() {
         authActivityViewModel.progressBar.observe(this) { state ->
             Log.d(_TAG, "progressBarAuthActivity changed: $state")
             when (state) {
-                LoadingState.LOADING -> {
-                    binding.loading.visibility = ProgressBar.VISIBLE
-                }
-                LoadingState.SUCCESS -> {
-                    binding.loading.visibility = ProgressBar.INVISIBLE
-                }
+                LoadingState.LOADING -> binding.loading.visibility = ProgressBar.VISIBLE
+                LoadingState.SUCCESS -> binding.loading.visibility = ProgressBar.INVISIBLE
                 else -> {
                     binding.loading.visibility = ProgressBar.INVISIBLE
                     Snackbar.make(binding.root, "FAILURE LOADING", Snackbar.LENGTH_LONG).show()
@@ -116,6 +112,7 @@ class AuthActivity : AppCompatActivity() {
             if (binding.txtEmail.text.toString().isEmpty() ||
                 binding.txtPass.text.toString().isEmpty()) {
                 Snackbar.make(binding.root, "Please Complete All Fields", Snackbar.LENGTH_LONG).show()
+                authActivityViewModel.setProgressBarState(LoadingState.SUCCESS)
                 return@setOnClickListener
             }
             authActivityViewModel.onRegisterClicked(
@@ -133,6 +130,10 @@ class AuthActivity : AppCompatActivity() {
                     Snackbar.make(binding.root, "FAILURE SIGN UP", Snackbar.LENGTH_LONG).show()
                 }
             }
+        }
+
+        binding.btnGuest.setOnClickListener {
+            //TODO
         }
     }
 

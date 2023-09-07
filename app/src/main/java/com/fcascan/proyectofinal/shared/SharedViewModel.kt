@@ -20,8 +20,10 @@ import com.fcascan.proyectofinal.repositories.PlaybackManager
 import com.fcascan.proyectofinal.repositories.FilesManager
 import com.fcascan.proyectofinal.repositories.FirestoreManager
 import com.fcascan.proyectofinal.repositories.StorageManager
+import com.google.firebase.installations.Utils
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.jvm.internal.Intrinsics.Kotlin
 
 
 class SharedViewModel : ViewModel() {
@@ -55,6 +57,7 @@ class SharedViewModel : ViewModel() {
 
     val confirmationDialogResponse: MutableLiveData<Boolean> = MutableLiveData()
 
+
     //User Detail:
     private var _userID: String = ""
     val userID: String get() = _userID
@@ -62,6 +65,7 @@ class SharedViewModel : ViewModel() {
 
     //One-time Methods:
     fun initiateApp(context: Context, onComplete: (Result) -> Unit) = viewModelScope.launch {
+        Log.d("$_TAG - initiateApp", "Starting App...")
         try {
             setItemsList(_firestoreManager.getCollectionByUserID(userID, ITEMS_COLLECTION) as MutableList<Item>)
             setCategoriesList(_firestoreManager.getCollectionByUserID(userID, CATEGORIES_COLLECTION) as MutableList<Category>)
@@ -251,8 +255,6 @@ class SharedViewModel : ViewModel() {
     fun getGroupsList(): MutableList<Group>? {
         return groupsList.value
     }
-
-
 
 
     //Private Methods:

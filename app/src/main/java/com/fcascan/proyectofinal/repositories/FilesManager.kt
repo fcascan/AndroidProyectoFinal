@@ -2,6 +2,8 @@ package com.fcascan.proyectofinal.repositories
 
 import android.content.Context
 import android.util.Log
+import com.fcascan.proyectofinal.enums.Result
+import com.google.firebase.installations.Utils
 import java.io.File
 import java.io.FileOutputStream
 
@@ -12,31 +14,32 @@ class FilesManager {
     //Received files are saved in: /data/data/com.fcascan.proyectofinal/files/received
 
     fun checkFoldersExistence(rootDirectory: File) {
-        Log.d("$_TAG - checkFolders", "Checking folders existence...")
+        Log.d("$_TAG - checkFoldersExistence", "Checking folders existence...")
         if (rootDirectory.exists()) {
+
             val audiosDirectory = File(rootDirectory, "audios")
             if (!audiosDirectory.exists()) {
                 audiosDirectory.mkdirs()
-                Log.d("$_TAG - checkFolders", "Folder created: ${audiosDirectory.absolutePath}")
+                Log.d("$_TAG - checkFoldersExistence", "Folder created: ${audiosDirectory.absolutePath}")
             } else {
-                Log.d("$_TAG - checkFolders", "Folder already exists: ${audiosDirectory.absolutePath}")
+                Log.d("$_TAG - checkFoldersExistence", "Folder already exists: ${audiosDirectory.absolutePath}")
             }
             val recordingsDirectory = File(rootDirectory, "recordings")
             if (!recordingsDirectory.exists()) {
                 recordingsDirectory.mkdirs()
-                Log.d("$_TAG - checkFolders", "Folder created: ${recordingsDirectory.absolutePath}")
+                Log.d("$_TAG - checkFoldersExistence", "Folder created: ${recordingsDirectory.absolutePath}")
             } else {
-                Log.d("$_TAG - checkFolders", "Folder already exists: ${recordingsDirectory.absolutePath}")
+                Log.d("$_TAG - checkFoldersExistence", "Folder already exists: ${recordingsDirectory.absolutePath}")
             }
             val receivedDirectory = File(rootDirectory, "received")
             if (!receivedDirectory.exists()) {
                 receivedDirectory.mkdirs()
-                Log.d("$_TAG - checkFolders", "Folder created: ${receivedDirectory.absolutePath}")
+                Log.d("$_TAG - checkFoldersExistence", "Folder created: ${receivedDirectory.absolutePath}")
             } else {
-                Log.d("$_TAG - checkFolders", "Folder already exists: ${receivedDirectory.absolutePath}")
+                Log.d("$_TAG - checkFoldersExistence", "Folder already exists: ${receivedDirectory.absolutePath}")
             }
         } else {
-            Log.e("$_TAG - checkFolders", "RootDirectory not recognized: ${rootDirectory.absolutePath}")
+            Log.e("$_TAG - checkFoldersExistence", "RootDirectory not recognized: ${rootDirectory.absolutePath}")
         }
     }
 
@@ -85,5 +88,24 @@ class FilesManager {
         }
     }
 
-
+    fun wipeLocalFiles(context: Context) {
+        Log.d("$_TAG - wipeLocalFiles", "Wiping local files...")
+        try {
+            val audiosDirectory = File(context.filesDir, "audios")
+            if (audiosDirectory.exists()) {
+                audiosDirectory.deleteRecursively()
+            }
+            val recordingsDirectory = File(context.filesDir, "recordings")
+            if (recordingsDirectory.exists()) {
+                recordingsDirectory.deleteRecursively()
+            }
+            val receivedDirectory = File(context.filesDir, "received")
+            if (receivedDirectory.exists()) {
+                receivedDirectory.deleteRecursively()
+            }
+            Log.d("$_TAG - wipeLocalFiles", "Local files wiped")
+        } catch (e: Exception) {
+            Log.e("$_TAG - wipeLocalFiles", "Failed to wipe local files, Exception: $e")
+        }
+    }
 }

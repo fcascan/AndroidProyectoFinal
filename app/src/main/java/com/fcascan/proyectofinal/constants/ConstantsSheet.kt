@@ -13,6 +13,7 @@ const val MAX_FILE_SIZE_BYTES: Long = 512 * 1024   //512KB
 
 //Auth:
 const val AUTH_DAYS_TO_EXPIRE_LOGIN = 30L
+const val AUTH_DAYS_TO_FORCE_EXPIRE_LOGIN = 365L
 
 //Actions:
 const val ACTION_SCREEN_ACTIONS = 1     //First Screen that lists the actions
