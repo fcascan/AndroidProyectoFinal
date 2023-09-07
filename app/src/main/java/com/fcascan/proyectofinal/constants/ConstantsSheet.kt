@@ -5,6 +5,9 @@ const val ITEMS_COLLECTION = "Items"
 const val CATEGORIES_COLLECTION = "Categories"
 const val GROUPS_COLLECTION = "Groups"
 
+//Timeouts (msecs):
+const val DOWNLOAD_COLLECTION_TIMEOUT = 10000L
+
 //File size:
 const val MAX_FILE_SIZE_BYTES: Long = 512 * 1024   //512KB
 

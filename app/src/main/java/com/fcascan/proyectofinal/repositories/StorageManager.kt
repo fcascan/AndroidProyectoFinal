@@ -3,11 +3,14 @@ package com.fcascan.proyectofinal.repositories
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.fcascan.proyectofinal.constants.DOWNLOAD_COLLECTION_TIMEOUT
 import com.fcascan.proyectofinal.constants.MAX_FILE_SIZE_BYTES
 import com.fcascan.proyectofinal.enums.Result
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 
 class StorageManager {
@@ -19,25 +22,28 @@ class StorageManager {
     suspend fun downloadCollectionByUserID(userID: String, context: Context) {
         //path: /{userID}/{itemID}.opus
         Log.d("$_TAG - downloadCollectionByUserID", "Downloading...")
-        _storage.reference
-            .child(userID)
-            .listAll()
-            .await().also{ listResult ->
-                listResult.items.forEach { item ->
-                    Log.d("$_TAG - downloadCollectionByUserID", "item: $item")
-                    val fileName = item.name
-                    item.getBytes(MAX_FILE_SIZE_BYTES)
-                        .addOnSuccessListener { bytes ->
-                            _filesManager.insertFileIntoInternalMemory(bytes, fileName, context)
-                        }
-                        .addOnFailureListener { exception ->
-                            Log.e("$_TAG - downloadCollectionByUserID", "Failed to download item: $item, Exception: $exception")
-                        }
+        try {
+            withTimeoutOrNull(DOWNLOAD_COLLECTION_TIMEOUT) {
+                _storage.reference
+                .child(userID)
+                .listAll()
+                .await().also{ listResult ->
+                    listResult.items.forEach { item ->
+                        Log.d("$_TAG - downloadCollectionByUserID", "item: $item")
+                        val fileName = item.name
+                        item.getBytes(MAX_FILE_SIZE_BYTES)
+                            .addOnSuccessListener { bytes ->
+                                _filesManager.insertFileIntoInternalMemory(bytes, fileName, context)
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.e("$_TAG - downloadCollectionByUserID", "Failed to download item: $item, Exception: $exception")
+                            }
+                    }
                 }
             }
-//            .addOnFailureListener { exception ->
-//                Log.e("$_TAG - downloadCollectionByUserID", "Failed to list items, Exception: $exception")
-//            }
+        } catch (exception: TimeoutCancellationException) {
+            Log.w("$_TAG - downloadCollectionByUserID", "Timeout reached for downloading files from Firebase...")
+        }
     }
 
     suspend fun uploadFile(file: File, storagePath: String, callback: (Result) -> Unit) {

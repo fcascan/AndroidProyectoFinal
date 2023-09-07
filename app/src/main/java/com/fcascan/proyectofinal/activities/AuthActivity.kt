@@ -90,6 +90,7 @@ class AuthActivity : AppCompatActivity() {
             if (binding.txtEmail.text.toString().isEmpty() ||
                 binding.txtPass.text.toString().isEmpty()) {
                 Snackbar.make(binding.root, "Please Complete All Fields", Snackbar.LENGTH_LONG).show()
+                authActivityViewModel.setProgressBarState(LoadingState.SUCCESS)
                 return@setOnClickListener
             }
             authActivityViewModel.onSignInClicked(
