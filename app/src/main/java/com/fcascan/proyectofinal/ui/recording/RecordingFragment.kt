@@ -86,7 +86,10 @@ class RecordingFragment : Fragment() {
             }
         }
 
-        //Event Listeners:
+        //Button Listeners:
+        binding.btnBack.setOnClickListener {
+            findNavController().navigateUp()
+        }
         binding.btnCardPlay.setOnClickListener {
             playbackStarted()
             sharedViewModel.playFile(file) {

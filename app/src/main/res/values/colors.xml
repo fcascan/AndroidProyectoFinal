@@ -1,26 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<!--    Standard colors-->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
 
+<!--    Custom colors-->
+    <!--    Light mode-->
     <color name="Bay_of_Many">#1f3a7a</color>
     <color name="San_Marino">#4d69b3</color>
     <color name="Polo_Blue">#89a6d7</color>
-    <color name="Jagged_Ice">#e7f2f3</color>
     <color name="Alice_Blue">#e0e8f0</color>
+    <color name="Jagged_Ice">#e7f2f3</color>
 
-    <color name="Pickled_Bluewood">#2b3d4f</color>
-    <color name="Shuttle_Gray">#5d6d7e</color>
+    <!--    Dark mode-->
     <color name="Cadet_Blue">#afb7c0</color>
-    <color name="Athens_Gray">#f9fafb</color>
-
-    <color name="Midnight">#001f3d</color>
     <color name="Dark_Slate_Green">#2e8b57</color>
     <color name="Dark_Slate_Grey">#2f4f4f</color>
+    <color name="Midnight">#001f3d</color>
 
+    <!--    Secondary colors-->
+    <color name="Pickled_Bluewood">#2b3d4f</color>
+    <color name="Shuttle_Gray">#5d6d7e</color>
+    <color name="Athens_Gray">#f9fafb</color>
+
+    <!--    Extra-->
     <color name="Saffron">#f7c040</color>
     <color name="Cinnabar">#e74d3c</color>
+
+    <!--    Buttons-->
+    <color name="Custom_Holo_Black_enabled">#000000</color>
+    <color name="Custom_Holo_Black_disabled">#44000000</color>
+    <color name="Custom_Holo_Blue_enabled">#ff33b5e5</color>
+    <color name="Custom_Holo_Blue_disabled">#4433b5e5</color>
+    <color name="Custom_Holo_Gray_enabled">#ff999999</color>
+    <color name="Custom_Holo_Gray_disabled">#33999999</color>
+    <color name="Custom_Holo_Green_enabled">#ff99cc00</color>
+    <color name="Custom_Holo_Green_disabled">#4499cc00</color>
+    <color name="Custom_Holo_Orange_enabled">#ffffbb33</color>
+    <color name="Custom_Holo_Orange_disabled">#44ffbb33</color>
+    <color name="Custom_Holo_Purple_enabled">#ffaa66cc</color>
+    <color name="Custom_Holo_Purple_disabled">#44aa66cc</color>
+    <color name="Custom_Holo_Red_enabled">#ffff4444</color>
+    <color name="Custom_Holo_Red_disabled">#44ff4444</color>
 </resources>

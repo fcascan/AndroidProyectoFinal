@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android" >
     <item android:state_enabled="true"
-        android:color="@color/Custom_Holo_Orange_enabled" />
+        android:color="@color/Custom_Holo_Gray_enabled" />
     <item android:state_enabled="false"
-        android:color="@color/Custom_Holo_Orange_disabled" />
+        android:color="@color/Custom_Holo_Gray_disabled" />
 </selector>

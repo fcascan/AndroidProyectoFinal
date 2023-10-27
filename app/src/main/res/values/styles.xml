@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<!--    Buttons-->
+    <style name="btn_black" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:backgroundTint">@color/btn_black</item>
+        <item name="android:textColor">@color/Athens_Gray</item>
+        <item name="iconTint">@color/Athens_Gray</item>
+    </style>
+    <style name="btn_light_blue" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:backgroundTint">@color/btn_light_blue</item>
+        <item name="android:textColor">@color/Athens_Gray</item>
+        <item name="iconTint">@color/Athens_Gray</item>
+    </style>
+    <style name="btn_light_gray" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:backgroundTint">@color/btn_light_gray</item>
+        <item name="android:textColor">@color/Athens_Gray</item>
+        <item name="iconTint">@color/Athens_Gray</item>
+    </style>
+    <style name="btn_light_green" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:backgroundTint">@color/btn_light_green</item>
+        <item name="android:textColor">@color/Athens_Gray</item>
+        <item name="iconTint">@color/Athens_Gray</item>
+    </style>
+    <style name="btn_light_orange" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:backgroundTint">@color/btn_light_orange</item>
+        <item name="android:textColor">@color/Athens_Gray</item>
+        <item name="iconTint">@color/Athens_Gray</item>
+    </style>
+    <style name="btn_light_purple" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:backgroundTint">@color/btn_light_purple</item>
+        <item name="android:textColor">@color/Athens_Gray</item>
+        <item name="iconTint">@color/Athens_Gray</item>
+    </style>
+    <style name="btn_light_red" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:backgroundTint">@color/btn_light_red</item>
+        <item name="android:textColor">@color/Athens_Gray</item>
+        <item name="iconTint">@color/Athens_Gray</item>
+    </style>
+
+<!--    Floating Action Button-->
+    <style name="fab_orange" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="android:backgroundTint">@color/btn_light_orange</item>
+        <item name="android:textColor">@color/Athens_Gray</item>
+        <item name="iconTint">@color/Athens_Gray</item>
+    </style>
+</resources>
